@@ -4,3 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+isahc = "1.7.2"
+duct = "0.13.7"
