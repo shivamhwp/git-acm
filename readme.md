@@ -14,25 +14,17 @@ acm (Auto Commit Messages) is a command-line tool that automatically generates d
 
 > if outputs the commit msg in the terminal if you like it > copy it > use it as commit msg.
 
-<br>
-
-### todo
+## todo
 
 - [x] get diff.
-
 - [x] get commit msg from api.
-
 - [ ] make it a cli tool.
-
 - [ ] better error handling.
-
 - [ ] supports openai, anthropic as well.
-
 - [ ] github release.
-
 - [ ] publish to brew.
 
-### local development setup
+## local development setup
 
 > ensure `rust` is installed on your system . go to [`https://doc.rust-lang.org/book/ch01-01-installation.html`](https://doc.rust-lang.org/book/ch01-01-installation.html) for details.
 
@@ -41,8 +33,18 @@ acm (Auto Commit Messages) is a command-line tool that automatically generates d
    ```
 2. get an gemini-api key (currenlty only this supported) [here](https://ai.google.dev/gemini-api/docs/quickstart?lang=rest).
 3. create `.env` file at root > set `GEMINI_API_KEY=" " `.
-4. ```rust
+4. ```bash
     cargo build
    ```
 5. `cargo run` to get the commit msg in the terminal.
 6. start with `main.rs` and break stuff.
+
+<br>
+
+> ### give your suggestions on what features i should add.
+
+<br>
+
+me : [shivam.ing](https://shivam.ing)
+
+<br>
