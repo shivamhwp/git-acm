@@ -1,4 +1,4 @@
-<b style = {color: "red"}>status</b> : currently in progress.
+<b>status</b> : currently in progress.
 
 _generate meaningful commit messages locally using AI_
 
