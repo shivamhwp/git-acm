@@ -4,5 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-isahc = "1.7.2"
+isahc = {version = "1.7.2", features = ["json"]}
 duct = "0.13.7"
+dotenvy = "0.15.7"
+serde_json = "1.0.134"
