@@ -48,3 +48,5 @@ acm (Auto Commit Messages) is a command-line tool that automatically generates d
 me : [shivam.ing](https://shivam.ing)
 
 <br>
+
+bhai : [sargam](https://x.com/sargampoudel) (project idea)
