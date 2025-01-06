@@ -1,22 +1,48 @@
+use clap::Command;
 use isahc::{prelude::*, Request};
 use serde_json::{json, Value};
 use std::time::Duration;
 use std::{env, fs};
+use yansi::Paint;
+
 mod diff;
 
 fn main() {
-    get_commit_msg();
+    let cli = Command::new("acm")
+        .author("shivam [shivam.ing]")
+        .version("0.1.0") // similar to cargo.toml file.
+        .about("generate meaningful commit messages locally using AI")
+        .subcommand_required(false)
+        .subcommand(
+            Command::new("run")
+                .about("explicit run command, does the same thing as running `acm` "),
+        )
+        // .override_help(help_message.to_string())
+        .get_matches();
+
+    match cli.subcommand() {
+        Some(("run", _)) => {
+            get_commit_msg();
+        }
+        None => {
+            get_commit_msg();
+        }
+        _ => {
+            get_commit_msg();
+        }
+    }
 }
 
 fn get_commit_msg() {
     dotenvy::dotenv().unwrap();
     let api_key = env::var("GEMINI_API_KEY").expect("API_KEY must be set");
+    let api_url = env::var("GEMINI_API_URL").expect("API_URL must be set");
 
     let prompt = fs::read_to_string("src/prompt.txt").expect("error occured");
 
     let full_diff = diff::get_diff();
 
-    let uri = format!("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={}", api_key);
+    let uri = format!("{}?key={}", api_url, api_key);
 
     let req_body = json!({
     "tools": [{"code_execution": {}}],
@@ -51,11 +77,11 @@ fn get_commit_msg() {
                 println!("{}", clear_msg);
             }
             Err(e) => {
-                println!("{}", e)
+                println!("{}", e.red())
             }
         },
         Err(e) => {
-            println!("{}", e)
+            println!("{}", e.red())
         }
     }
 }

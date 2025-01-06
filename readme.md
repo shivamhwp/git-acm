@@ -18,7 +18,7 @@ acm (Auto Commit Messages) is a command-line tool that automatically generates d
 
 - [x] get diff.
 - [x] get commit msg from api.
-- [ ] make it a cli tool.
+- [x] make it a cli tool.
 - [ ] better error handling.
 - [ ] supports openai, anthropic as well.
 - [ ] github release.
