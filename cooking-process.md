@@ -31,3 +31,10 @@ this file is just my documentaion of thoughts, when i was building this.
 - you install the binary or the package. (it gets stored in .acm dir in your root dir. which contains an executable whenever you run acm command in terminal)
 
 - i think that's it. let's build this.
+
+---
+
+### making it a cli tool
+
+- so as a cli tool, what will it need.
+  1.  cli argument parser, like i run `acm run` or `acm` and it runs the thing. (i don't think i need specific commands rn).
