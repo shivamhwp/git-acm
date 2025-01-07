@@ -1,4 +1,10 @@
-0.1.0
+### 0.1.1
 
-- just released.
-- available as a rust package.
+    - bug fix.
+    - readme updates.
+
+### 0.1.0
+
+    - just released.
+    - available as a rust package.
+    - not suitable for use (contains a bug).
