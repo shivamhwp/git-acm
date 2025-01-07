@@ -10,7 +10,7 @@ mod diff;
 fn main() {
     let cli = Command::new("git-acm")
         .author("shivam [shivam.ing]")
-        .version("0.1.0") // similar to cargo.toml file.
+        .version("0.1.2") // similar to cargo.toml file.
         .about("generate meaningful commit messages locally using AI")
         .subcommand_required(false)
         .subcommand(
