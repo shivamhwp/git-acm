@@ -1,8 +1,8 @@
 use clap::Command;
 use isahc::{prelude::*, Request};
 use serde_json::{json, Value};
+use std::env;
 use std::time::Duration;
-use std::{env, fs};
 use yansi::Paint;
 
 mod diff;
@@ -34,11 +34,17 @@ fn main() {
 }
 
 fn get_commit_msg() {
-    dotenvy::dotenv().unwrap();
+    //checks if env exists
+    dotenvy::dotenv().ok();
     let api_key = env::var("GEMINI_API_KEY").expect("API_KEY must be set");
     let api_url = env::var("GEMINI_API_URL").expect("API_URL must be set");
 
-    let prompt = fs::read_to_string("src/prompt.txt").expect("error occured");
+    let prompt = include_str!("../assets/prompt.txt");
+
+    if prompt.is_empty() {
+        println!("{}", "no prompt found".red());
+        return;
+    }
 
     let full_diff = diff::get_diff();
 
