@@ -16,7 +16,7 @@ _generate meaningful commit messages locally using AI_.
 2. add [gemini-api-key](https://aistudio.google.com/app/apikey).
 3. add this ⬇️︎ in your project's `.env` file.
 
-```JSON
+```
    GEMINI_API_KEY="YOUR_API_KEY"
    GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 ```
