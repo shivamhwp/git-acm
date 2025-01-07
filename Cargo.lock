@@ -277,7 +277,7 @@ dependencies = [
 
 [[package]]
 name = "git-acm"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "clap",
  "dotenvy",
