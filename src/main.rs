@@ -8,14 +8,14 @@ use yansi::Paint;
 mod diff;
 
 fn main() {
-    let cli = Command::new("acm")
+    let cli = Command::new("git-acm")
         .author("shivam [shivam.ing]")
         .version("0.1.0") // similar to cargo.toml file.
         .about("generate meaningful commit messages locally using AI")
         .subcommand_required(false)
         .subcommand(
             Command::new("run")
-                .about("explicit run command, does the same thing as running `acm` "),
+                .about("explicit run command, does the same thing as running `git-acm` "),
         )
         // .override_help(help_message.to_string())
         .get_matches();
