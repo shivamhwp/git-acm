@@ -1,12 +1,12 @@
 [package]
 name = "git-acm"
-description = "tool to generate meaningful commit messages locally using AI"
+description = "this helps you generate meaningful commit messages locally using AI"
 version = "0.1.1"
 edition = "2021"
 license-file = "LICENSE"
-homepage = "https://github.com/shivamhwp/acm"
-repository = "https://github.com/shivamhwp/acm"
-readme = "readme.md"
+homepage = "https://github.com/shivamhwp/git-acm"
+repository = "https://github.com/shivamhwp/git-acm"
+readme = "cargo-readme.md"
 
 
 [dependencies]
