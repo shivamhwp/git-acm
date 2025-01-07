@@ -1,43 +1,40 @@
 # git-acm - git auto-commit-message
 
-_generate meaningful commit messages locally using AI_
+_generate meaningful commit messages locally using AI_.
 
-acm (Auto Commit Messages) is a command-line tool that automatically generates descriptive commit messages by analyzing your git diff. It leverages the AI to provide intelligent and context-aware commit message suggestions.
-
-> some features are currently in progress. it's works with gemini-api rn. and available as pkg for your rust project. working on the binary release.
-
-<br>
-
-> ‼ keep in mind, this requirements must be met, i'm working on error handling so these things don't cause much problems. ty.
-
-<b><u>requirements</u></b>
+### ❗requirements</u></b>
 
 1. you should have git installed initialised in the repo.
 2. stage the changes you want to commit.
-3. just run `acm` or `acm run`.
+3. just run `git-acm` or `git-acm run`.
 
-> if outputs the commit msg in the terminal if you like it > copy it > use it as commit msg.
+### how to use
 
-## todo
+> ensure `rust` is [`installed`](https://doc.rust-lang.org/book/ch01-01-installation.html) on your system and requirements are met.
 
-- [x] get diff.
-- [x] get commit msg from api.
-- [x] make it a cli tool.
-- [ ] publish to cargo as a pacakge.
-- [ ] better error handling.
-- [ ] supports openai, anthropic as well.
-- [ ] github release.
-- [ ] publish to brew or binary release.
+1. run `cargo install git-acm`.
+2. add [gemini-api-key](https://aistudio.google.com/app/apikey).
+3. add this ⬇️︎ in your project's `.env` file.
 
-maybe later -> a website for this project.
+```JSON
+   GEMINI_API_KEY="YOUR_API_KEY"
+   GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+```
 
-## local development setup
+4. run `git-acm`.
+
+ <br>
+
+# Contributing
+
+### local development setup
 
 > ensure `rust` is installed on your system . go to [`https://doc.rust-lang.org/book/ch01-01-installation.html`](https://doc.rust-lang.org/book/ch01-01-installation.html) for details.
 
 1. ```bash
-    git clone https://github.com/shivamhwp/acm.git
+   git clone https://github.com/shivamhwp/acm.git
    ```
+
 2. get an gemini-api key (currenlty only this supported) [here](https://ai.google.dev/gemini-api/docs/quickstart?lang=rest).
 3. create `.env` file at root > set `GEMINI_API_KEY=" " `.
 4. ```bash
@@ -48,12 +45,8 @@ maybe later -> a website for this project.
 
 <br>
 
-> ### give your suggestions on what features i should add.
+[report 🐞bugs here](https://x.com/shivamhwp)
+
+bhai(s) : [sargam](https://x.com/sargampoudel) (idea) and [smr](https://x.com/smrdotgg) (suggestions).
 
 <br>
-
-me : [shivam.ing](https://shivam.ing)
-
-<br>
-
-bhai : [sargam](https://x.com/sargampoudel) (project idea)
