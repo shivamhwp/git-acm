@@ -1,7 +1,15 @@
 [package]
 name = "acm"
+description = "tool to generate meaningful commit messages locally using AI"
 version = "0.1.0"
 edition = "2021"
+license-file = "LICENSE"
+homepage = "https://github.com/shivamhwp/acm"
+repository = "https://github.com/shivamhwp/acm"
+readme = "readme.md"
+categories = ["ai","command-line"]
+keywords = ["command-line-tools", "ai", "git"]
+
 
 [dependencies]
 isahc = {version = "1.7.2", features = ["json"]}
