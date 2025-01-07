@@ -3,18 +3,6 @@
 version = 4
 
 [[package]]
-name = "acm"
-version = "0.1.0"
-dependencies = [
- "clap",
- "dotenvy",
- "duct",
- "isahc",
- "serde_json",
- "yansi",
-]
-
-[[package]]
 name = "anstream"
 version = "0.6.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -285,6 +273,18 @@ dependencies = [
  "parking",
  "pin-project-lite",
  "waker-fn",
+]
+
+[[package]]
+name = "git-acm"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "dotenvy",
+ "duct",
+ "isahc",
+ "serde_json",
+ "yansi",
 ]
 
 [[package]]

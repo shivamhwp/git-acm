@@ -1,5 +1,5 @@
 [package]
-name = "acm"
+name = "git-acm"
 description = "tool to generate meaningful commit messages locally using AI"
 version = "0.1.0"
 edition = "2021"
