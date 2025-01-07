@@ -7,8 +7,6 @@ license-file = "LICENSE"
 homepage = "https://github.com/shivamhwp/acm"
 repository = "https://github.com/shivamhwp/acm"
 readme = "readme.md"
-categories = ["ai","command-line"]
-keywords = ["command-line-tools", "ai", "git"]
 
 
 [dependencies]
