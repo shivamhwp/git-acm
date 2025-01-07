@@ -7,7 +7,7 @@ license-file = "LICENSE"
 homepage = "https://github.com/shivamhwp/git-acm"
 repository = "https://github.com/shivamhwp/git-acm"
 readme = "cargo-readme.md"
-include = ["./src/prompt.txt"]
+
 
 
 [dependencies]
