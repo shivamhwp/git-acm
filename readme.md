@@ -1,7 +1,5 @@
 # git-acm - git auto-commit-message
 
-> ❗currently in alpha stage - contains 🐞bugs, not ready for production 🛫.
-
 _generate meaningful commit messages locally using AI_.
 
 ### ❗requirements</u></b>
