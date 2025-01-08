@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>git-acm : auto-commit-messages</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+      :root {
+        --primary: #238636;
+        --text: #c9d1d9;
+        --background: #000000;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--background);
+        color: var(--text);
+        line-height: 1.6;
+        font-family: "Press Start 2P", -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Helvetica, Arial, sans-serif;
+      }
+
+      .hero {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-content {
+        max-width: 800px;
+        z-index: 1;
+      }
+
+      .hero h1 {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px var(--primary);
+      }
+
+      .hero p {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+        opacity: 0;
+        animation: fadeIn 0.8s ease-out forwards;
+        animation-delay: 0.4s;
+      }
+
+      .terminal {
+        background-color: rgba(28, 33, 40, 0.9);
+        padding: 1.5rem;
+        border-radius: 6px;
+        margin: 2rem 0;
+        font-family: "Courier New", monospace;
+        position: relative;
+        overflow: hidden;
+        height: 150px;
+        box-shadow: 0 0 20px rgba(35, 134, 54, 0.4);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .terminal::before {
+        content: "● ● ●";
+        position: absolute;
+        top: 0.5rem;
+        left: 1rem;
+        color: #606770;
+      }
+
+      .terminal .command {
+        color: #4caf50;
+        margin-bottom: 0.5rem;
+      }
+
+      .terminal .output {
+        color: #ffffff;
+        font-size: 1rem;
+        line-height: 1.5;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+      }
+
+      .glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle,
+          rgba(35, 134, 54, 0.2) 0%,
+          rgba(0, 0, 0, 0) 70%
+        );
+        z-index: -1;
+      }
+
+      .particles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+
+      footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        padding: 1rem;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      footer a {
+        color: var(--primary);
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      footer a:hover {
+        color: var(--text);
+      }
+
+      .github-logo {
+        width: 24px;
+        height: 24px;
+        fill: var(--text);
+        transition: transform 0.3s ease;
+      }
+
+      .github-logo:hover {
+        transform: rotate(360deg) scale(1.1);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+
+        .hero p {
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="hero">
+      <canvas class="particles" id="particles"></canvas>
+      <div class="hero-content">
+        <h1>git-acm</h1>
+        <p>generate meaningful commit messages locally using AI.</p>
+        <div class="terminal" id="terminal">
+          <div class="glow"></div>
+          <span class="command">$ git acm</span>
+          <span class="output"></span>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <a href="https://shivam.ing" target="_blank" rel="noopener noreferrer"
+        >shivam.ing</a
+      >
+      <a
+        href="https://github.com/shivamhwp/git-acm"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="GitHub repository"
+      >
+        <svg class="github-logo" viewBox="0 0 16 16">
+          <path
+            fill-rule="evenodd"
+            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+          ></path>
+        </svg>
+      </a>
+    </footer>
+
+    <script>
+      // Particle animation
+      const canvas = document.getElementById("particles");
+      const ctx = canvas.getContext("2d");
+      let particles = [];
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      class Particle {
+        constructor() {
+          this.reset();
+        }
+
+        reset() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 2 + 1;
+          this.speedX = Math.random() * 2 - 1;
+          this.speedY = Math.random() * 2 - 1;
+          this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        }
+
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+
+          if (
+            this.x < 0 ||
+            this.x > canvas.width ||
+            this.y < 0 ||
+            this.y > canvas.height
+          ) {
+            this.reset();
+          }
+        }
+
+        draw() {
+          ctx.fillStyle = this.color;
+          ctx.fillRect(this.x, this.y, this.size, this.size);
+        }
+      }
+
+      function initParticles() {
+        particles = [];
+        for (let i = 0; i < 100; i++) {
+          particles.push(new Particle());
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach((particle) => {
+          particle.update();
+          particle.draw();
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      // Terminal animation
+      const terminal = document.getElementById("terminal");
+      const messages = ["analyzing...", "generating...", "feat: auth system"];
+      let messageIndex = 0;
+      let charIndex = 0;
+
+      function typeMessage() {
+        const outputElement = terminal.querySelector(".output");
+        outputElement.innerHTML = ""; // Clear previous content
+        let currentMessageIndex = 0;
+
+        function typeNextMessage() {
+          if (currentMessageIndex < messages.length) {
+            const message = messages[currentMessageIndex];
+            const messageElement = document.createElement("div");
+            outputElement.appendChild(messageElement);
+
+            let charIndex = 0;
+            function typeChar() {
+              if (charIndex < message.length) {
+                messageElement.textContent += message[charIndex];
+                charIndex++;
+                setTimeout(typeChar, 100);
+              } else {
+                currentMessageIndex++;
+                setTimeout(typeNextMessage, 1000);
+              }
+            }
+            typeChar();
+          } else {
+            setTimeout(() => {
+              outputElement.innerHTML = "";
+              typeMessage();
+            }, 2000);
+          }
+        }
+
+        typeNextMessage();
+      }
+
+      // Initialize
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+      initParticles();
+      animate();
+      typeMessage();
+    </script>
+  </body>
+</html>
