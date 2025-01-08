@@ -1,12 +1,14 @@
 # git-acm - git auto-commit-message
 
+![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm)
+
 _generate meaningful commit messages locally using AI_.
 
 ### ❗requirements</u></b>
 
 1. you should have git installed initialised in the repo.
 2. stage the changes you want to commit.
-3. just run `git-acm` or `git-acm run`.
+3. just run `git-acm`.
 
 ### how to use
 
