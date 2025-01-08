@@ -1,3 +1,8 @@
+### 0.1.2
+
+    - working. let's fking go.
+    - [crates.io](https://crates.io/crates/git-acm)
+
 ### 0.1.1
 
     - bug fix.
