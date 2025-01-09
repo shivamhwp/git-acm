@@ -28,10 +28,10 @@ VALIDATIONS:
 5. No trailing punctuation
 
 GOOD EXAMPLES:
-✓ feat: Add user authentication (24 chars)
-✓ fix(api): Resolve memory leak (27 chars)
-✓ docs: Update README installation (31 chars)
-✓ style(css): Format login component (32 chars)
+✓ feat: Add user authentication 
+✓ fix(api): Resolve memory leak 
+✓ docs: Update README installation 
+✓ style(css): Format login component 
 
 BAD EXAMPLES:
 ✗ feat: Implemented new authentication system (44 chars, wrong tense)
