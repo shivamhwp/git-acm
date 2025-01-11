@@ -58,7 +58,7 @@ pub fn anthropic() {
                 let commit_msg = &v["content"][0]["text"];
                 let final_msg = commit_msg.to_string();
                 let clear_msg = final_msg.trim_end();
-                println!("{}", clear_msg);
+                println!("{}", clear_msg.blue());
             }
             Err(e) => {
                 println!("{}", e.red())

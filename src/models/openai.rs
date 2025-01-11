@@ -40,7 +40,7 @@ pub fn openai() {
                 "content": [
                     {
                         "type": "text",
-                        "text": format!("here's the git diff {}", full_diff)
+                        "text": format!("here's the git diff from which you have to generate a git-commit-message {}", full_diff)
                     }
                 ]
             }
@@ -63,7 +63,6 @@ pub fn openai() {
                 // https://docs.rs/serde_json/latest/serde_json/enum.Value.html#method.get
 
                 let v: Value = serde_json::from_str(&res).unwrap();
-                println!("{}", v);
                 let commit_msg = &v["choices"][0]["message"]["content"];
 
                 let final_msg = commit_msg.to_string();
