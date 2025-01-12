@@ -58,10 +58,6 @@ pub fn openai() {
     match response {
         Ok(mut res) => match res.text() {
             Ok(res) => {
-                // if you wanna more fields like promptTokenCount, totalTokenCount etc.
-                // println!("{}", v) > you'll get the field names > access them using serde_json's get method
-                // https://docs.rs/serde_json/latest/serde_json/enum.Value.html#method.get
-
                 let v: Value = serde_json::from_str(&res).unwrap();
                 let commit_msg = &v["choices"][0]["message"]["content"];
 
