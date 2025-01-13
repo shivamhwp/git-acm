@@ -60,15 +60,28 @@ fi
 
 progress "Installing to: $INSTALL_DIR"
 
-# Use specific version tag instead of latest
+# Use specific version tag
 VERSION="v1.0.0"  # Update this to match your latest version
-DOWNLOAD_URL="https://github.com/shivamhwp/git-acm/releases/download/${VERSION}/${BINARY}"
+DOWNLOAD_URL="https://github.com/shivamhwp/git-acp/releases/download/${VERSION}/${BINARY}"
 
 progress "Downloading version ${VERSION}..."
 
-# Download and install
-curl -sL "$DOWNLOAD_URL" -o "$INSTALL_DIR/git-acm"
-chmod +x "$INSTALL_DIR/git-acm"
+# Create temporary directory for download
+TMP_DIR=$(mktemp -d)
+TMP_FILE="${TMP_DIR}/${BINARY}"
+
+# Download the binary to temporary location
+curl -sL "$DOWNLOAD_URL" -o "$TMP_FILE"
+
+# Make it executable
+chmod +x "$TMP_FILE"
+
+# Move to final location with correct permissions
+mv "$TMP_FILE" "$INSTALL_DIR/git-acm"
+chmod 755 "$INSTALL_DIR/git-acm"
+
+# Clean up
+rm -rf "$TMP_DIR"
 
 progress "Installation complete! Try running: git acm"
 progress "Note: You may need to restart your terminal or run 'source ~/.bashrc' to update your PATH"

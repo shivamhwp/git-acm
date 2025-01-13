@@ -1,4 +1,4 @@
-name: binary releases
+name: Release
 
 on:
   push:
@@ -40,14 +40,12 @@ jobs:
       - name: Prepare Release
         shell: bash
         run: |
-          # Get version from tag
-          VERSION=${GITHUB_REF#refs/tags/}
-
-          # Prepare binary with platform name
+          # Copy binary with proper permissions
           if [ "${{ matrix.platform.os }}" = "windows-latest" ]; then
             cp "target/${{ matrix.platform.target }}/release/git-acm.exe" "${{ matrix.platform.name }}"
           else
             cp "target/${{ matrix.platform.target }}/release/git-acm" "${{ matrix.platform.name }}"
+            # Ensure binary is executable
             chmod +x "${{ matrix.platform.name }}"
           fi
 
@@ -57,3 +55,4 @@ jobs:
           artifacts: ${{ matrix.platform.name }}
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
+          artifactContentType: application/octet-stream # Ensure binary format is preserved
