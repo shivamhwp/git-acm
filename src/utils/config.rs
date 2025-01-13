@@ -59,8 +59,49 @@ pub fn load_value() -> String {
     }
 }
 
-pub fn save_value(value: &str) -> std::io::Result<()> {
-    config_exists()?;
+pub fn save_value(value: &str) {
+    if config_exists().is_err() {
+        println!("{}", "config doesn't exist".red());
+        return;
+    };
     let config_file = get_config_dir().join("model.txt");
-    fs::write(config_file, value)
+    match fs::write(config_file, value) {
+        Ok(_ok) => {
+            println!("{}{}", value, " saved as default.".green())
+        }
+        Err(_e) => {
+            println!("{}{}", value, "i couldn't save it, as a default.".red())
+        }
+    }
+}
+
+pub fn get_api_key(value: &str) -> String {
+    let key = format!("{}_API_KEY", value.to_uppercase());
+
+    match env::var(key) {
+        Ok(k) => {
+            return k.to_string();
+        }
+        Err(_e) => {
+            println!("{}", "couldn't get the api key".red());
+            println!(
+                "{}",
+                "either export the key in terminal or define them in .env"
+            );
+            return "".to_string();
+        }
+    }
+}
+
+pub fn get_api_url(value: &str, default: &str) -> String {
+    let key = format!("{}_API_URL", value.to_uppercase());
+    match env::var(key) {
+        Ok(k) => {
+            return k.to_string();
+        }
+        Err(_e) => {
+            println!("{}", "couldn't get the api url".red());
+            return default.to_string();
+        }
+    }
 }
