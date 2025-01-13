@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set Up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Add Execution Permissions (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: chmod +x ./ # Ensure all scripts/files have proper permissions
+
+      - name: Install Required Rust Targets
+        run: |
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            rustup target add x86_64-unknown-linux-gnu || echo "target ubuntu failed"
+          elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+            rustup target add x86_64-apple-darwin || echo "target macos failed"
+          else
+            rustup target add x86_64-pc-windows-msvc || echo "window target failed"
+
+      - name: Build Project
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            cargo build --release --target x86_64-pc-windows-msvc
+          else
+            cargo build --release  || exit 1
+
+      - name: Rename Binary
+        run: |
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            mv target/x86_64-unknown-linux-gnu/release/git-acm git-acm-linux
+          elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+            mv target/release/git-acm git-acm-macos
+          else
+            mv target/x86_64-pc-windows-msvc/release/git-acm.exe git-acm-windows.exe
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            git-acm-linux
+            git-acm-macos
+            git-acm-windows.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Use GitHub's token for authentication
