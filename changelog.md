@@ -1,10 +1,16 @@
-### 1.0.0 (a big release)
+### 1.0.1
 
-    - features include
+    📍 a big release
+
     - supports anthropic, openai and gemini apis.
     - better error handling.
     - use command to switch apis.
-    - api preference stored in ~/.config/git-acm/model.txt.
+    - the msg automatically copies to clipboard.
+    - a lot of refactoring.
+
+### 1.0.0
+
+    - testing binaries and stuff.
 
 ### 0.1.2
 
