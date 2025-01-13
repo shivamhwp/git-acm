@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    name: Release - ${{ matrix.platform.os }}
+    runs-on: ${{ matrix.platform.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            binary_name: git-acm
+            asset_name: git-acm-linux-amd64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            binary_name: git-acm
+            asset_name: git-acm-macos-amd64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            binary_name: git-acm.exe
+            asset_name: git-acm-windows-amd64.exe
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform.target }}
+
+      - name: Build binary
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --target ${{ matrix.platform.target }}
+
+      - name: Prepare binary
+        shell: bash
+        run: |
+          cd target/${{ matrix.platform.target }}/release
+          if [ "${{ matrix.platform.os }}" = "windows-latest" ]; then
+            7z a ../../../${{ matrix.platform.asset_name }}.zip ${{ matrix.platform.binary_name }}
+          else
+            tar -czf ../../../${{ matrix.platform.asset_name }}.tar.gz ${{ matrix.platform.binary_name }}
+          fi
+
+      - name: Generate SHA-256 checksums
+        shell: bash
+        run: |
+          if [ "${{ matrix.platform.os }}" = "windows-latest" ]; then
+            sha256sum ${{ matrix.platform.asset_name }}.zip > ${{ matrix.platform.asset_name }}.zip.sha256
+          else
+            sha256sum ${{ matrix.platform.asset_name }}.tar.gz > ${{ matrix.platform.asset_name }}.tar.gz.sha256
+          fi
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            ${{ matrix.platform.asset_name }}.*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
