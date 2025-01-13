@@ -1,4 +1,4 @@
-name: Release
+name: binary releases
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - "v*"
 
 permissions:
-  contents: write # Explicitly grant permissions to create releases
+  contents: write
 
 jobs:
   release:
@@ -18,16 +18,13 @@ jobs:
         platform:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            binary_name: git-acm
-            asset_name: git-acm-linux-amd64
+            name: git-acm-linux-x86_64
           - os: macos-latest
             target: x86_64-apple-darwin
-            binary_name: git-acm
-            asset_name: git-acm-macos-amd64
+            name: git-acm-darwin-x86_64
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            binary_name: git-acm.exe
-            asset_name: git-acm-windows-amd64.exe
+            name: git-acm-windows-x86_64.exe
 
     steps:
       - uses: actions/checkout@v4
@@ -40,30 +37,23 @@ jobs:
       - name: Build
         run: cargo build --release --target ${{ matrix.platform.target }}
 
-      - name: Prepare binary (Unix)
-        if: matrix.platform.os != 'windows-latest'
+      - name: Prepare Release
+        shell: bash
         run: |
-          cd target/${{ matrix.platform.target }}/release/
-          tar -czf ../../../${{ matrix.platform.asset_name }}.tar.gz ${{ matrix.platform.binary_name }}
-          if [ "${{ matrix.platform.os }}" = "ubuntu-latest" ]; then
-            sha256sum ../../../${{ matrix.platform.asset_name }}.tar.gz > ../../../${{ matrix.platform.asset_name }}.tar.gz.sha256
+          # Get version from tag
+          VERSION=${GITHUB_REF#refs/tags/}
+
+          # Prepare binary with platform name
+          if [ "${{ matrix.platform.os }}" = "windows-latest" ]; then
+            cp "target/${{ matrix.platform.target }}/release/git-acm.exe" "${{ matrix.platform.name }}"
           else
-            shasum -a 256 ../../../${{ matrix.platform.asset_name }}.tar.gz > ../../../${{ matrix.platform.asset_name }}.tar.gz.sha256
+            cp "target/${{ matrix.platform.target }}/release/git-acm" "${{ matrix.platform.name }}"
+            chmod +x "${{ matrix.platform.name }}"
           fi
 
-      - name: Prepare binary (Windows)
-        if: matrix.platform.os == 'windows-latest'
-        shell: pwsh
-        run: |
-          cd target/${{ matrix.platform.target }}/release/
-          Compress-Archive -Path ${{ matrix.platform.binary_name }} -DestinationPath ../../../${{ matrix.platform.asset_name }}.zip
-          Get-FileHash -Path ../../../${{ matrix.platform.asset_name }}.zip -Algorithm SHA256 | ForEach-Object { $_.Hash } > ../../../${{ matrix.platform.asset_name }}.zip.sha256
-
-      - name: Create Release
+      - name: Release
         uses: ncipollo/release-action@v1
         with:
+          artifacts: ${{ matrix.platform.name }}
           allowUpdates: true
-          artifacts: "${{ matrix.platform.asset_name }}.*"
           token: ${{ secrets.GITHUB_TOKEN }}
-          prerelease: false
-          draft: false
