@@ -1,6 +1,6 @@
 use clap::Command;
 use models::{anthropic::anthropic, gemini::gemini, openai::openai};
-use std::fs;
+use utils::config::{load_value, save_value};
 use yansi::Paint;
 
 mod models;
@@ -65,28 +65,6 @@ fn get_commit_msg() {
                 "{}",
                 "no api selected. choose from  [ openai | anthropic | gemini ]".red()
             )
-        }
-    }
-}
-
-fn save_value(value: &str) -> std::io::Result<()> {
-    return fs::write("assets/model.txt", value);
-}
-
-fn load_value() -> String {
-    let model = "assets/model.txt";
-
-    match fs::read_to_string(model) {
-        Ok(s) => {
-            return s;
-        }
-        Err(e) => {
-            println!(
-                "{}",
-                "couldn't get the default model, running with gemini once".red()
-            );
-            println!("{}", e);
-            return "gemini".to_string();
         }
     }
 }
