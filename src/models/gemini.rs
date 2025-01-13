@@ -56,7 +56,7 @@ pub fn gemini() {
                 let commit_msg = &v["candidates"][0]["content"]["parts"][0]["text"];
 
                 let final_msg = commit_msg.to_string();
-                let clear_msg = final_msg.trim();
+                let clear_msg = final_msg.trim().trim_matches(|c| c == '"' || c == '\n');
                 println!("{}", clear_msg.blue());
             }
             Err(e) => {

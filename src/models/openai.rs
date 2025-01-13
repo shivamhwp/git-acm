@@ -62,7 +62,7 @@ pub fn openai() {
                 let commit_msg = &v["choices"][0]["message"]["content"];
 
                 let final_msg = commit_msg.to_string();
-                let clear_msg = final_msg.trim_end();
+                let clear_msg = final_msg.trim_matches(|c| c == '"' || c == '\n');
                 println!("{}", clear_msg.blue());
             }
             Err(e) => {

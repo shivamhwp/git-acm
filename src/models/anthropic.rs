@@ -53,7 +53,7 @@ pub fn anthropic() {
                 let v: Value = serde_json::from_str(&res).unwrap();
                 let commit_msg = &v["content"][0]["text"];
                 let final_msg = commit_msg.to_string();
-                let clear_msg = final_msg.trim_end();
+                let clear_msg = final_msg.trim_matches(|c| c == '"' || c == '\n');
                 println!("{}", clear_msg.blue());
             }
             Err(e) => {
