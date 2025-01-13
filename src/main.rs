@@ -1,6 +1,9 @@
 use clap::Command;
 use models::{anthropic::anthropic, gemini::gemini, openai::openai};
-use utils::config::{load_value, save_value};
+use utils::{
+    config::{load_value, save_value},
+    diff::is_git_initialized,
+};
 use yansi::Paint;
 
 mod models;
@@ -14,7 +17,7 @@ fn main() {
 
     let cli = Command::new("git-acm")
         .author("shivam [shivam.ing]")
-        .version("0.1.2") // similar to cargo.toml file.
+        .version("1.0.0") // similar to cargo.toml file.
         .about(description)
         .subcommand(
             Command::new("use")
@@ -54,6 +57,7 @@ fn main() {
 }
 
 fn get_commit_msg() {
+    is_git_initialized();
     let model = load_value();
     match model.as_str() {
         "openai" => openai(),
