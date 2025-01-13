@@ -1,51 +1,74 @@
 #!/bin/bash
 
-# Detect OS
-OS="$(uname -s)"
-case "${OS}" in
-    Linux*)     MACHINE=linux;;
-    Darwin*)    MACHINE=macos;;
-    CYGWIN*|MINGW*|MSYS*) MACHINE=windows;;
-    *)          echo "Unsupported operating system: ${OS}" && exit 1;;
+set -e
+
+# Function to show progress
+progress() {
+    echo "=> $1"
+}
+
+# Detect platform
+PLATFORM="unknown"
+case "$(uname -s)" in
+    Linux*)  PLATFORM="linux";;
+    Darwin*) PLATFORM="darwin";;
+    MSYS*|MINGW*) PLATFORM="windows";;
+    *)
+        echo "Unsupported platform: $(uname -s)"
+        exit 1
+        ;;
 esac
 
-# Download latest release for detected OS
-echo "Downloading git-acm for ${MACHINE}..."
-curl -L "https://github.com/shivamhwp/git-acm/releases/latest/download/git-acm-${MACHINE}" -o git-acm
-if [ $? -ne 0 ]; then
-    echo "Error downloading git-acm for ${MACHINE}. Exiting."
-    exit 1
-fi
+ARCH="x86_64"  # Add more architectures as needed
 
-# Make executable and install
-chmod +x git-acm
-
-# Check if sudo is available, if not, notify the user
-if ! command -v sudo &> /dev/null; then
-    echo "sudo is required to install git-acm to /usr/local/bin. Please install sudo and try again."
-    exit 1
-fi
-
-# Check if git-acm already exists in /usr/local/bin
-if command -v git-acm &> /dev/null; then
-    echo "git-acm is already installed. Overwriting the existing version."
-fi
-
-if [ "${MACHINE}" = "windows" ]; then
-    # For Windows, we move the file with .exe extension
-    mv git-acm git-acm.exe
-    # No need to use sudo, just place it in a directory in PATH
-    mv git-acm.exe /c/Program\ Files/git-acm/
+# Construct binary name
+if [ "$PLATFORM" = "windows" ]; then
+    BINARY="git-acm-windows-x86_64.exe"
 else
-    sudo mv git-acm /usr/local/bin/
+    BINARY="git-acm-${PLATFORM}-${ARCH}"
 fi
 
-# Create config directory
-mkdir -p ~/.config/git-acm
+progress "Detected platform: $PLATFORM-$ARCH"
 
-# Create default config if it doesn't exist
-if [ ! -f ~/.config/git-acm/model.txt ]; then
-    echo "openai" > ~/.config/git-acm/model.txt
+# Determine install location with fallbacks
+if [ "$PLATFORM" = "windows" ]; then
+    INSTALL_DIR="$HOME/bin"
+    mkdir -p "$INSTALL_DIR"
+else
+    # Try /usr/local/bin first
+    if [ -w "/usr/local/bin" ]; then
+        INSTALL_DIR="/usr/local/bin"
+    # Then try ~/.local/bin
+    elif [ -d "$HOME/.local/bin" ] || mkdir -p "$HOME/.local/bin"; then
+        INSTALL_DIR="$HOME/.local/bin"
+        # Add to PATH if not already there
+        if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc" 2>/dev/null || true
+        fi
+    # Finally, try ~/bin
+    else
+        INSTALL_DIR="$HOME/bin"
+        mkdir -p "$INSTALL_DIR"
+        # Add to PATH if not already there
+        if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
+            echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.bashrc"
+            echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.zshrc" 2>/dev/null || true
+        fi
+    fi
 fi
 
-echo "git-acm installed successfully!"
+progress "Installing to: $INSTALL_DIR"
+
+# Use specific version tag instead of latest
+VERSION="v1.0.0"  # Update this to match your latest version
+DOWNLOAD_URL="https://github.com/YOUR_USERNAME/YOUR_REPO/releases/download/${VERSION}/${BINARY}"
+
+progress "Downloading version ${VERSION}..."
+
+# Download and install
+curl -sL "$DOWNLOAD_URL" -o "$INSTALL_DIR/git-acm"
+chmod +x "$INSTALL_DIR/git-acm"
+
+progress "Installation complete! Try running: git acm"
+progress "Note: You may need to restart your terminal or run 'source ~/.bashrc' to update your PATH"
