@@ -78,11 +78,11 @@ pub fn openai() {
                 println!("{}", clear_msg.blue());
             }
             Err(e) => {
-                println!("{}", e.red())
+                println!("{}", e.red());
             }
         },
         Err(e) => {
-            println!("{}", e.red())
+            println!("{}", e.red());
         }
     }
     return;

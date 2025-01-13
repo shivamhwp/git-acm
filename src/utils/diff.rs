@@ -2,7 +2,6 @@ use duct::cmd;
 use yansi::Paint;
 
 pub fn get_diff() -> String {
-    is_git_initialized();
     let no_diff_err_message = "🤔 are the changes staged ?".red().to_string();
 
     match cmd!("git", "diff", "--staged", "--color=always").read() {
@@ -11,7 +10,7 @@ pub fn get_diff() -> String {
         }
         Err(_e) => {
             println!("{}", no_diff_err_message);
-            println!("{}", "💡 try `git init` to initialise a git repo".red());
+            println!("{}", "💡 try `git add <file_name>` to stage changes".red());
             return "".to_string();
         }
     }
@@ -26,7 +25,8 @@ pub fn is_git_initialized() {
         }
         Err(_e) => {
             println!("{}", no_git_err_message);
-            println!("{}", "💡 try `git init` to initialise a git repo".red())
+            println!("{}", "💡 try `git init` to initialise a git repo".red());
+            return;
         }
     }
 }
