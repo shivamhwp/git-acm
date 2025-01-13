@@ -28,7 +28,7 @@ else
     BINARY="git-acm-${PLATFORM}-${ARCH}"
 fi
 
-DOWNLOAD_URL="https://github.com/YOUR_USERNAME/YOUR_REPO/releases/download/${VERSION}/${BINARY}"
+DOWNLOAD_URL="https://github.com/shivamhwp/git-acm/releases/download/${VERSION}/${BINARY}"
 CHECKSUM_URL="${DOWNLOAD_URL}.sha256"
 
 # Create temporary directory
