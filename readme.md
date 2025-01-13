@@ -22,8 +22,9 @@ cargo install git-acm
 
 ### how to use
 
-1. add [gemini-api-key](https://aistudio.google.com/app/apikey) or [openai-api-key](https://platform.openai.com/api-keys) or [anthropic-api-key](https://console.anthropic.com/settings/keys)
-2. add these in your project's `.env` file or `export` them in terminal.
+1. ensure git is initialized in the dir. or run `git init`.
+2. add [gemini-api-key](https://aistudio.google.com/app/apikey) or [openai-api-key](https://platform.openai.com/api-keys) or [anthropic-api-key](https://console.anthropic.com/settings/keys)
+3. add these in your project's `.env` file or `export` them in terminal.
 
 ```
 # for gemini api
