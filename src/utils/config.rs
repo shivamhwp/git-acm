@@ -7,7 +7,7 @@ use std::{
 use yansi::Paint;
 
 fn get_config_dir() -> PathBuf {
-    let home = env::var("HOME").expect("couldn't get the home dir");
+    let home = env::var("HOME").unwrap_or_else(|_| ".".to_string());
     return Path::new(&home).join(".config").join("git-acm");
 }
 
