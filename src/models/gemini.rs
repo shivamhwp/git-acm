@@ -53,8 +53,6 @@ pub fn gemini() {
         Ok(mut res) => match res.text() {
             Ok(res) => {
                 let v: Value = serde_json::from_str(&res).unwrap();
-
-                println!("{}", v);
                 let commit_msg = &v["candidates"][0]["content"]["parts"][0]["text"];
 
                 let final_msg = commit_msg.to_string();
