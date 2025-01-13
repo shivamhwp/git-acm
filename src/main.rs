@@ -10,8 +10,9 @@ mod models;
 mod utils;
 
 fn main() {
-    let description = "generate meaningful commit messages locally using AI. go to https://github.com/shivamhwp/git-acm for more details."
-        .blue()
+    let description = "
+  generate meaningful commit messages locally using AI. go to https://github.com/shivamhwp/git-acm for more details."
+        .magenta().bold()
         .to_string();
     // let run_command = "explicit run command, does the same thing as running `git-acm`";
 
@@ -35,15 +36,9 @@ fn main() {
         }
         Some(("use", sub_matches)) => {
             match sub_matches.subcommand() {
-                Some(("openai", _)) => {
-                    save_value("openai").expect("the default api was not set to openai")
-                }
-                Some(("anthropic", _)) => {
-                    save_value("anthropic").expect("the default api was not set to anthropic")
-                }
-                Some(("gemini", _)) => {
-                    save_value("gemini").expect("the default value was not set to gemini")
-                }
+                Some(("openai", _)) => save_value("openai"),
+                Some(("anthropic", _)) => save_value("anthropic"),
+                Some(("gemini", _)) => save_value("gemini"),
                 _ => {
                     println!("{}", "choose an api to make requests".red())
                 }
@@ -64,10 +59,10 @@ fn get_commit_msg() {
         "anthropic" => anthropic(),
         "gemini" => gemini(),
         _ => {
-            println!("{}", "no default api found".red());
+            println!("{}", "   no default api found.".red());
             println!(
                 "{}",
-                "no api selected. choose from  [ openai | anthropic | gemini ]".red()
+                "💡 choose from [ openai | anthropic | gemini ].".green()
             )
         }
     }
