@@ -1,5 +1,7 @@
 # git-acm - git auto-commit-message
 
+![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/shivamhwp/git-acm/release.yml)
+
 _generate meaningful commit messages locally using AI_.
 
 ### installation
