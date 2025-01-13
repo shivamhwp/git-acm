@@ -2,21 +2,27 @@
 
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm)
 
-_generate meaningful commit messages locally using AI_.
+_generate meaningful commit messages blazingly fast, locally using AI_.
 
-### ❗requirements</u></b>
+written in rust btw.
 
-1. you should have git installed initialised in the repo.
-2. stage the changes you want to commit.
-3. just run `git-acm`.
+### installation
+
+```
+curl -fsSL https://raw.githubusercontent.com/shivamhwp/git-acm/main/install.sh | sh
+```
+
+or
+if you have `cargo` installed on your system.
+
+```
+cargo install git-acm
+```
 
 ### how to use
 
-> ensure `rust` is [`installed`](https://doc.rust-lang.org/book/ch01-01-installation.html) on your system and requirements are met.
-
-1. run `cargo install git-acm`.
-2. add [gemini-api-key](https://aistudio.google.com/app/apikey) or [openai-api-key](https://platform.openai.com/api-keys) or [anthropic-api-key](https://console.anthropic.com/settings/keys)
-3. add this ⬇️︎ in your project's `.env` file or `export` them in terminal.
+1. add [gemini-api-key](https://aistudio.google.com/app/apikey) or [openai-api-key](https://platform.openai.com/api-keys) or [anthropic-api-key](https://console.anthropic.com/settings/keys)
+2. add these in your project's `.env` file or `export` them in terminal.
 
 ```
 # for gemini api
@@ -38,9 +44,13 @@ OPENAI_API_KEY=""
 
 4. run `git-acm`.
 
- <br>
+### 📍 commands available
 
-crates.io -> [https://crates.io/crates/git-acm/](https://crates.io/crates/git-acm/)
+`use` : choose which api to run. options : `openai` | `anthropic` | `gemini`
+
+autosaves the one you chose in `~/.config/git-acm/model.txt` file.
+
+→ to change just run the `use` command with the preferred api.
 
 # Contributing
 
@@ -52,12 +62,12 @@ crates.io -> [https://crates.io/crates/git-acm/](https://crates.io/crates/git-ac
    git clone https://github.com/shivamhwp/acm.git
    ```
 
-2. get an gemini-api key (currenlty only this supported) [here](https://ai.google.dev/gemini-api/docs/quickstart?lang=rest).
+2. get [gemini-api-credentials](https://aistudio.google.com/app/apikey) or [openai-api-credentials](https://platform.openai.com/api-keys) or [anthropic-api-credentials](https://console.anthropic.com/settings/keys). see [.env.example](https://github.com/shivamhwp/git-acm/blob/main/.env.example)
 3. create `.env` file at root > set `GEMINI_API_KEY=" " `.
 4. ```bash
     cargo build
    ```
-5. `cargo run` to get the commit msg in the terminal.
+5. `cargo run --` to get the commit msg in the terminal.
 6. start with `main.rs` and break stuff.
 
 <br>
