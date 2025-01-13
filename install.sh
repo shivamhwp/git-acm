@@ -2,7 +2,6 @@
 
 set -e
 
-# Function to show progress
 progress() {
     echo "=> $1"
 }
@@ -19,69 +18,88 @@ case "$(uname -s)" in
         ;;
 esac
 
-ARCH="x86_64"  # Add more architectures as needed
+ARCH="x86_64"
+VERSION="v1.0.0"  # Update this to match your version
 
-# Construct binary name
+# Construct binary name and URLs
 if [ "$PLATFORM" = "windows" ]; then
     BINARY="git-acm-windows-x86_64.exe"
 else
     BINARY="git-acm-${PLATFORM}-${ARCH}"
 fi
 
-progress "Detected platform: $PLATFORM-$ARCH"
+DOWNLOAD_URL="https://github.com/YOUR_USERNAME/YOUR_REPO/releases/download/${VERSION}/${BINARY}"
+CHECKSUM_URL="${DOWNLOAD_URL}.sha256"
 
-# Determine install location with fallbacks
-if [ "$PLATFORM" = "windows" ]; then
-    INSTALL_DIR="$HOME/bin"
-    mkdir -p "$INSTALL_DIR"
-else
-    # Try /usr/local/bin first
-    if [ -w "/usr/local/bin" ]; then
-        INSTALL_DIR="/usr/local/bin"
-    # Then try ~/.local/bin
-    elif [ -d "$HOME/.local/bin" ] || mkdir -p "$HOME/.local/bin"; then
-        INSTALL_DIR="$HOME/.local/bin"
-        # Add to PATH if not already there
-        if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
-            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc" 2>/dev/null || true
-        fi
-    # Finally, try ~/bin
-    else
-        INSTALL_DIR="$HOME/bin"
-        mkdir -p "$INSTALL_DIR"
-        # Add to PATH if not already there
-        if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
-            echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.bashrc"
-            echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.zshrc" 2>/dev/null || true
-        fi
-    fi
-fi
-
-progress "Installing to: $INSTALL_DIR"
-
-# Use specific version tag
-VERSION="v1.0.0"  # Update this to match your latest version
-DOWNLOAD_URL="https://github.com/shivamhwp/git-acp/releases/download/${VERSION}/${BINARY}"
-
-progress "Downloading version ${VERSION}..."
-
-# Create temporary directory for download
+# Create temporary directory
 TMP_DIR=$(mktemp -d)
 TMP_FILE="${TMP_DIR}/${BINARY}"
+TMP_CHECKSUM="${TMP_DIR}/${BINARY}.sha256"
 
-# Download the binary to temporary location
+# Download files
+progress "Downloading binary and checksum..."
 curl -sL "$DOWNLOAD_URL" -o "$TMP_FILE"
+curl -sL "$CHECKSUM_URL" -o "$TMP_CHECKSUM"
 
-# Make it executable
-chmod +x "$TMP_FILE"
+# Verify checksum
+progress "Verifying checksum..."
+if command -v sha256sum >/dev/null; then
+    SHA256_CMD="sha256sum"
+elif command -v shasum >/dev/null; then
+    SHA256_CMD="shasum -a 256"
+else
+    echo "Error: No sha256sum or shasum command found"
+    exit 1
+fi
 
-# Move to final location with correct permissions
+if ! (cd "$TMP_DIR" && $SHA256_CMD -c "${BINARY}.sha256"); then
+    echo "Error: Checksum verification failed"
+    rm -rf "$TMP_DIR"
+    exit 1
+fi
+
+# Determine install location
+if [ "$PLATFORM" = "darwin" ]; then
+    INSTALL_DIR="$HOME/.local/bin"
+    mkdir -p "$INSTALL_DIR"
+elif [ -w "/usr/local/bin" ]; then
+    INSTALL_DIR="/usr/local/bin"
+else
+    INSTALL_DIR="$HOME/.local/bin"
+    mkdir -p "$INSTALL_DIR"
+fi
+
+# Install binary
+progress "Installing to $INSTALL_DIR..."
 mv "$TMP_FILE" "$INSTALL_DIR/git-acm"
 chmod 755 "$INSTALL_DIR/git-acm"
 
-# Clean up
+# Handle macOS specific security
+if [ "$PLATFORM" = "darwin" ]; then
+    progress "Handling macOS security..."
+    xattr -d com.apple.quarantine "$INSTALL_DIR/git-acm" 2>/dev/null || true
+    # If using newer macOS versions, might need to add to security list
+    if [ -x "/usr/bin/spctl" ]; then
+        sudo spctl --add "$INSTALL_DIR/git-acm" 2>/dev/null || true
+    fi
+fi
+
+# Add to PATH if needed
+if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
+    if [ -f "$HOME/.zshrc" ]; then
+        echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$HOME/.zshrc"
+    fi
+    if [ -f "$HOME/.bashrc" ]; then
+        echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$HOME/.bashrc"
+    fi
+fi
+
+# Cleanup
 rm -rf "$TMP_DIR"
 
-progress "Installation complete! Try running: git acm"
-progress "Note: You may need to restart your terminal or run 'source ~/.bashrc' to update your PATH"
+progress "Installation complete! You may need to:"
+progress "1. Run 'source ~/.zshrc' or restart your terminal"
+if [ "$PLATFORM" = "darwin" ]; then
+    progress "2. Go to System Preferences -> Security & Privacy and allow the binary if prompted"
+fi
+progress "Then try running: git acm"

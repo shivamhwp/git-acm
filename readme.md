@@ -9,7 +9,7 @@ written in rust btw.
 ### installation
 
 ```
-curl -fsSL https://raw.githubusercontent.com/shivamhwp/git-acm/main/install.sh | sh
+curl -sSL https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/install.sh | sh
 ```
 
 or
