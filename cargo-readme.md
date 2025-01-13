@@ -2,25 +2,40 @@
 
 _generate meaningful commit messages locally using AI_.
 
-### ❗requirements</u></b>
+### installation
 
-1. you should have git installed initialised in the repo.
-2. stage the changes you want to commit.
-3. just run `git-acm` or `git-acm run`.
+```
+curl -sSL https://raw.githubusercontent.com/shivamhwp/git-acm/main/install.sh | sh
+```
+
+or
+if you have `cargo` installed on your system.
+
+```
+cargo install git-acm
+```
 
 ### how to use
 
-> ensure `rust` is [`installed`](https://doc.rust-lang.org/book/ch01-01-installation.html) on your system and requirements are met.
+1. add [gemini-api-key](https://aistudio.google.com/app/apikey) or [openai-api-key](https://platform.openai.com/api-keys) or [anthropic-api-key](https://console.anthropic.com/settings/keys)
+2. add these in your project's `.env` file or `export` them in terminal.
 
-1. run `cargo install git-acm`.
-2. add [gemini-api-key](https://aistudio.google.com/app/apikey).
-3. add this ⬇️︎ in your project's `.env` file.
+```
+# for gemini api
 
-```JSON
-   GEMINI_API_KEY="YOUR_API_KEY"
-   GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+GEMINI_API_KEY=""
+
+# for anthropic api
+
+ANTHROPIC_API_URL="https://api.anthropic.com/v1/messages"
+ANTHROPIC_API_KEY=""
+
+# for openai api
+
+OPENAI_API_URL="https://api.openai.com/v1/chat/completions"
+OPENAI_API_KEY=""
+
 ```
 
 4. run `git-acm`.
-
- <br>
