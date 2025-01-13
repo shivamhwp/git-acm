@@ -1,21 +1,28 @@
 use isahc::{prelude::*, Request};
 use serde_json::{json, Value};
-use std::env;
 use std::time::Duration;
 use yansi::Paint;
 
+use crate::utils::config::{get_api_key, get_api_url};
 use crate::utils::diff::get_diff;
 
 pub fn anthropic() {
     //checks if env exists
     dotenvy::dotenv().ok();
-    let api_key = env::var("ANTHROPIC_API_KEY").expect("API_KEY must be set");
-    let api_url = env::var("ANTHROPIC_API_URL").expect("API_URL must be set");
+    let api_url = get_api_url("anthropic", "https://api.anthropic.com/v1/messages");
+    let api_key = get_api_key("anthropic");
 
     let prompt = include_str!("../../assets/prompt.txt");
 
     if prompt.is_empty() {
         println!("{}", "no prompt found".red());
+        return;
+    }
+    if get_diff().is_empty() {
+        print!(
+            "{}",
+            "stage the changes before running the command".magenta()
+        );
         return;
     }
 

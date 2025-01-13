@@ -1,16 +1,16 @@
 use isahc::{prelude::*, Request};
 use serde_json::{json, Value};
-use std::env;
 use std::time::Duration;
 use yansi::Paint;
 
+use crate::utils::config::{get_api_key, get_api_url};
 use crate::utils::diff::get_diff;
 
 pub fn openai() {
     //checks if env exists
     dotenvy::dotenv().ok();
-    let api_key = env::var("OPENAI_API_KEY").expect("API_KEY must be set");
-    let api_url = env::var("OPENAI_API_URL").expect("API_URL must be set");
+    let api_url = get_api_url("openai", "https://api.openai.com/v1/chat/completions");
+    let api_key = get_api_key("openai");
 
     let prompt = include_str!("../../assets/prompt.txt");
 
@@ -19,11 +19,15 @@ pub fn openai() {
         return;
     }
 
+    if get_diff().is_empty() {
+        return;
+    }
+
     let full_diff = get_diff();
     if full_diff.is_empty() {
         println!(
             "{}",
-            "either there are no changes or i'm unable to find diff for some reason.".red()
+            "either there are no changes or they are not staged".red()
         );
         println!("{}", "💡 try `git add <file_name> `".red());
         return;

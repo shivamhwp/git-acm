@@ -1,21 +1,27 @@
 use isahc::{prelude::*, Request};
 use serde_json::{json, Value};
-use std::env;
 use std::time::Duration;
 use yansi::Paint;
 
+use crate::utils::config::{get_api_key, get_api_url};
 use crate::utils::diff::get_diff;
 
 pub fn gemini() {
     //checks if env exists
     dotenvy::dotenv().ok();
-    let api_key = env::var("GEMINI_API_KEY").expect("API_KEY must be set");
-    let api_url = env::var("GEMINI_API_URL").expect("API_URL must be set");
+    let api_url = get_api_url(
+        "gemini",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+    );
+    let api_key = get_api_key("gemini");
 
     let prompt = include_str!("../../assets/prompt.txt");
 
     if prompt.is_empty() {
         println!("{}", "no prompt found".red());
+        return;
+    }
+    if get_diff().is_empty() {
         return;
     }
 
