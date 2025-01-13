@@ -19,7 +19,7 @@ fn main() {
 
     let cli = Command::new("git-acm")
         .author("shivam [shivam.ing]")
-        .version("1.0.1") // similar to cargo.toml file.
+        .version("1.0.2") // similar to cargo.toml file.
         .about(description)
         .subcommand(
             Command::new("use")

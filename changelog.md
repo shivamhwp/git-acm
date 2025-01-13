@@ -1,3 +1,8 @@
+### 1.0.2
+
+    - perf improvements.
+    - bug fixes.
+
 ### 1.0.1
 
     📍 a big release
