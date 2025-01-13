@@ -19,7 +19,8 @@ case "$(uname -s)" in
 esac
 
 ARCH="x86_64"
-VERSION="v1.0.0"  # Update this to match your version
+VERSION=$(curl -s https://api.github.com/repos/shivamhwp/git-acm/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+# gets the latest version 
 
 # Construct binary name and URLs
 if [ "$PLATFORM" = "windows" ]; then
