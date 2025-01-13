@@ -25,12 +25,16 @@ pub fn is_git_initialized() {
 
     match cmd!("git", "rev-parse", "--is-inside-work-tree").read() {
         Ok(result) => {
-            if result != "true" {
+            if result.trim() != "true" {
                 println!("{}", no_git_err_message);
                 println!("{}", "💡 try `git init` to initialise a git repo".red());
-                return;
+                std::process::exit(1);
             }
         }
-        _ => {}
+        Err(_) => {
+            println!("{}", no_git_err_message);
+            println!("{}", "💡 try `git init` to initialise a git repo".red());
+            std::process::exit(1);
+        }
     }
 }
