@@ -3,7 +3,7 @@ use serde_json::{json, Value};
 use std::time::Duration;
 use yansi::Paint;
 
-use crate::utils::config::{get_api_key, get_api_url};
+use crate::utils::config::{copy_to_clipboard, get_api_key, get_api_url};
 use crate::utils::diff::get_diff;
 
 pub fn gemini() {
@@ -72,6 +72,7 @@ pub fn gemini() {
                 let final_msg = commit_msg.to_string();
                 let clear_msg = final_msg.trim().trim_matches(|c| c == '"' || c == '\n');
                 println!("{}", clear_msg.blue());
+                copy_to_clipboard(clear_msg).unwrap_or_default();
             }
             Err(e) => {
                 println!("{}", e.red())

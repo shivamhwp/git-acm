@@ -1,3 +1,4 @@
+use arboard::Clipboard;
 use std::{
     env, fs,
     io::Error,
@@ -104,4 +105,16 @@ pub fn get_api_url(value: &str, default: &str) -> String {
             return default.to_string();
         }
     }
+}
+
+pub fn copy_to_clipboard(text: &str) -> Result<(), Box<dyn std::error::Error>> {
+    match Clipboard::new()?.set_text(text) {
+        Ok(_t) => {
+            println!("{}", "automatically copied to clipboard".magenta());
+        }
+        Err(_e) => {
+            println!("{}", "couldn't copy to clipboard".yellow());
+        }
+    }
+    Ok(())
 }
