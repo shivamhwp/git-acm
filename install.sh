@@ -62,7 +62,7 @@ progress "Installing to: $INSTALL_DIR"
 
 # Use specific version tag instead of latest
 VERSION="v1.0.0"  # Update this to match your latest version
-DOWNLOAD_URL="https://github.com/YOUR_USERNAME/YOUR_REPO/releases/download/${VERSION}/${BINARY}"
+DOWNLOAD_URL="https://github.com/shivamhwp/git-acm/releases/download/${VERSION}/${BINARY}"
 
 progress "Downloading version ${VERSION}..."
 
