@@ -103,4 +103,4 @@ progress "1. Run 'source ~/.zshrc' or restart your terminal"
 if [ "$PLATFORM" = "darwin" ]; then
     progress "2. Go to System Preferences -> Security & Privacy and allow the binary if prompted"
 fi
-progress "Then try running: git acm"
+progress "Then try running: git-acm"
