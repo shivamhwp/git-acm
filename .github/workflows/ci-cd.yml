@@ -34,6 +34,7 @@ jobs:
             rustup target add x86_64-apple-darwin || echo "target macos failed"
           else
             rustup target add x86_64-pc-windows-msvc || echo "window target failed"
+          fi
 
       - name: Build Project
         run: |
@@ -50,6 +51,7 @@ jobs:
             mv target/release/git-acm git-acm-macos
           else
             mv target/x86_64-pc-windows-msvc/release/git-acm.exe git-acm-windows.exe
+          fi
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
