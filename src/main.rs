@@ -10,6 +10,7 @@ mod models;
 mod utils;
 
 fn main() {
+    is_git_initialized();
     let description = "
   generate meaningful commit messages locally using AI. go to https://github.com/shivamhwp/git-acm for more details."
         .magenta().bold()
@@ -18,7 +19,7 @@ fn main() {
 
     let cli = Command::new("git-acm")
         .author("shivam [shivam.ing]")
-        .version("1.0.0") // similar to cargo.toml file.
+        .version("1.0.1") // similar to cargo.toml file.
         .about(description)
         .subcommand(
             Command::new("use")
@@ -40,7 +41,8 @@ fn main() {
                 Some(("anthropic", _)) => save_value("anthropic"),
                 Some(("gemini", _)) => save_value("gemini"),
                 _ => {
-                    println!("{}", "choose an api to make requests".red())
+                    println!("{}", "choose an api to make requests".red());
+                    return;
                 }
             }
             get_commit_msg();
@@ -52,7 +54,6 @@ fn main() {
 }
 
 fn get_commit_msg() {
-    is_git_initialized();
     let model = load_value();
     match model.as_str() {
         "openai" => openai(),
@@ -63,7 +64,8 @@ fn get_commit_msg() {
             println!(
                 "{}",
                 "💡 choose from [ openai | anthropic | gemini ].".green()
-            )
+            );
+            return;
         }
     }
 }
