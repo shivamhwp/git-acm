@@ -21,6 +21,15 @@ pub fn anthropic() {
 
     let full_diff = get_diff();
 
+    if full_diff.is_empty() {
+        println!(
+            "{}",
+            "either there are no changes or i'm unable to find diff for some reason.".red()
+        );
+        println!("{}", "💡 try `git add <file_name> `".red());
+        return;
+    }
+
     let uri = format!("{}?key={}", api_url, api_key);
 
     let req_body = json!({
