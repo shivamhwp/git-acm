@@ -62,7 +62,7 @@ pub fn load_value() -> String {
 
 pub fn save_value(value: &str) {
     if config_exists().is_err() {
-        println!("{}", "config doesn't exist".red());
+        println!("{}", "config doesn't exist ".red());
         return;
     };
     let config_file = get_config_dir().join("model.txt");
@@ -71,7 +71,7 @@ pub fn save_value(value: &str) {
             println!("{}{}", value, " saved as default.".green())
         }
         Err(_e) => {
-            println!("{}{}", value, "i couldn't save it, as a default.".red())
+            println!("{}{}", value, "i couldn't save it, as a default. 😔".red())
         }
     }
 }
@@ -101,7 +101,7 @@ pub fn get_api_url(value: &str, default: &str) -> String {
             return k.to_string();
         }
         Err(_e) => {
-            println!("{}", "couldn't get the api url".red());
+            println!("{}", "couldn't get the api url ".red());
             return default.to_string();
         }
     }
@@ -110,10 +110,10 @@ pub fn get_api_url(value: &str, default: &str) -> String {
 pub fn copy_to_clipboard(text: &str) -> Result<(), Box<dyn std::error::Error>> {
     match Clipboard::new()?.set_text(text) {
         Ok(_t) => {
-            println!("{}", "automatically copied to clipboard".magenta());
+            println!("{}", "( automatically copied to clipboard 👍)".magenta());
         }
         Err(_e) => {
-            println!("{}", "couldn't copy to clipboard".yellow());
+            println!("{}", "( couldn't copy to clipboard 🥲 )".yellow());
         }
     }
     Ok(())
