@@ -6,11 +6,11 @@
 - [x] get commit msg from api.
 - [x] make it a cli tool.
 - [x] publish to cargo as a pacakge.
-- [ ] better error handling.
-- [x] supports openai, anthropic as well. - 📍
+- [x] better error handling.
+- [x] supports openai, anthropic as well.
 - [x] setup cli for diff apis
 - [x] github release.
-- [ ] publish to brew or binary release.
+- [x] binary release.
 
 letting users choose the models will be more benificial. (set a default and let users choos.)
 

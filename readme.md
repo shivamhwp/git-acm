@@ -2,7 +2,7 @@
 
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm)
 
-_generate meaningful commit messages blazingly fast, locally using AI_.
+_instant meaningful git commit messages, locally with AI_.
 
 written in rust btw.
 

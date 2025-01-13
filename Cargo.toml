@@ -1,6 +1,6 @@
 [package]
 name = "git-acm"
-description = "this helps you generate meaningful commit messages locally using AI"
+description = "instant meaningful git commit messages, locally with AI"
 version = "1.0.1"
 edition = "2021"
 license-file = "LICENSE"
