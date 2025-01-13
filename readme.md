@@ -43,7 +43,8 @@ OPENAI_API_KEY=""
 
 ```
 
-4. run `git-acm`.
+4. run `git-acm use <api_name>`.
+5. just run `git-acm`.
 
 ### 📍 commands available
 
