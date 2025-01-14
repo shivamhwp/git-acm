@@ -1,9 +1,10 @@
 # git-acm - git auto-commit-message
 
-![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/shivamhwp/git-acm/release.yml)
+![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/shivamhwp/git-acm/release.yml)
 
 _instant meaningful git commit messages, locally with AI_.
+
+upvote it on peerlist : [upvote on peerlist ⬆️](https://peerlist.io/shivamhwp/project/gitacm)
 
 written in rust btw.
 
