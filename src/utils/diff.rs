@@ -1,22 +1,15 @@
 use duct::cmd;
 use yansi::Paint;
 
-pub fn get_diff() -> String {
-    let no_diff_err_message = " 🤔 are the changes staged ?".red().to_string();
+use crate::utils::checks::Check;
 
+pub fn get_diff() -> String {
     match cmd!("git", "diff", "--staged", "--color=always").read() {
         Ok(result) => {
-            if result.is_empty() {
-                println!("{}", no_diff_err_message);
-                println!(
-                    "{}",
-                    " 💡 try `git add <file_name>` to stage changes.".red()
-                );
-                return String::new();
-            }
+            Check::is_diff_empty(&result);
             return result;
         }
-        Err(_) => return String::new(),
+        Err(_) => return "".to_string(),
     }
 }
 
