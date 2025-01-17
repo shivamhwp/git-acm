@@ -3,6 +3,7 @@ use serde_json::{json, Value};
 use std::time::Duration;
 use yansi::Paint;
 
+use crate::utils::checks::Check;
 use crate::utils::config::{copy_to_clipboard, get_api_key, get_api_url};
 use crate::utils::diff::get_diff;
 
@@ -11,31 +12,14 @@ pub fn anthropic() {
     dotenvy::dotenv().ok();
     let api_url = get_api_url("anthropic", "https://api.anthropic.com/v1/messages");
     let api_key = get_api_key("anthropic");
+    Check::api_key_present(&api_key);
+    Check::api_url_present(&api_url);
 
     let prompt = include_str!("../../assets/prompt.txt");
-
-    if prompt.is_empty() {
-        println!("{}", "no prompt found".red());
-        return;
-    }
-    if get_diff().is_empty() {
-        print!(
-            "{}",
-            "stage the changes before running the command".magenta()
-        );
-        return;
-    }
-
     let full_diff = get_diff();
 
-    if full_diff.is_empty() {
-        println!(
-            "{}",
-            "either there are no changes or i'm unable to find diff for some reason.".red()
-        );
-        println!("{}", "💡 try `git add <file_name> `".red());
-        return;
-    }
+    Check::is_prompt_empty(prompt);
+    Check::is_diff_empty(&full_diff);
 
     let uri = format!("{}?key={}", api_url, api_key);
 
