@@ -4,7 +4,7 @@ use std::time::Duration;
 use yansi::Paint;
 
 use crate::utils::checks::Check;
-use crate::utils::config::{copy_to_clipboard, get_api_key, get_api_url};
+use crate::utils::config::{copy_to_clipboard, get_api_key, get_api_url, run_git_commit};
 use crate::utils::diff::get_diff;
 
 pub fn openai() {
@@ -65,6 +65,7 @@ pub fn openai() {
                 let clear_msg = final_msg.trim_matches(|c| c == '"' || c == '\n');
                 println!("{}", clear_msg.blue());
                 copy_to_clipboard(clear_msg).unwrap_or_default();
+                run_git_commit(clear_msg);
             }
             Err(e) => {
                 println!("{}", e.red());
