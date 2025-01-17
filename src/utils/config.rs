@@ -1,4 +1,5 @@
 use arboard::Clipboard;
+use duct::cmd;
 use std::{
     env, fs,
     io::Error,
@@ -48,6 +49,7 @@ pub fn load_value() -> String {
             return "openai".to_string();
         }
     }
+
     match fs::read_to_string(config_file) {
         Ok(s) => s.trim().to_string(),
         Err(e) => {
@@ -60,15 +62,55 @@ pub fn load_value() -> String {
     }
 }
 
+pub fn load_auto_commit_value() -> String {
+    let auto_commit = get_config_dir().join("autocommit.txt");
+
+    if !auto_commit.exists() {
+        if let Err(e) = fs::write(&auto_commit, "disable") {
+            println!("{}", format!("error with autocommit.txt file {}", e).red());
+            return "disable".to_string();
+        }
+    }
+
+    match fs::read_to_string(auto_commit) {
+        Ok(a) => return a.trim().to_string(),
+        Err(e) => {
+            println!(
+                "{}",
+                format!("Error reading autocommit, set as disable {}", e).red()
+            );
+            return "disable".to_string();
+        }
+    }
+}
+
 pub fn save_value(value: &str) {
     if config_exists().is_err() {
         println!("{}", "config doesn't exist ".red());
         return;
     };
     let config_file = get_config_dir().join("model.txt");
+
     match fs::write(config_file, value) {
         Ok(_ok) => {
             println!("{}{}", value, " saved as default.".green())
+        }
+        Err(_e) => {
+            println!("{}{}", value, "i couldn't save it, as a default. 😔".red())
+        }
+    }
+}
+
+pub fn save_autcommit_preference(value: &str) {
+    let auto_commit = get_config_dir().join("autocommit.txt");
+    if config_exists().is_err() {
+        println!("{}", "config doesn't exist ".red());
+        return;
+    };
+
+    match fs::write(auto_commit, value) {
+        Ok(_ok) => {
+            println!("{}{}", "autocommit ".green(), value)
         }
         Err(_e) => {
             println!("{}{}", value, "i couldn't save it, as a default. 😔".red())
@@ -85,10 +127,6 @@ pub fn get_api_key(value: &str) -> String {
         }
         Err(_e) => {
             println!("{}", "couldn't get the api key".red());
-            println!(
-                "{}",
-                "either export the key in terminal or define them in .env"
-            );
             return "".to_string();
         }
     }
@@ -117,4 +155,38 @@ pub fn copy_to_clipboard(text: &str) -> Result<(), Box<dyn std::error::Error>> {
         }
     }
     Ok(())
+}
+
+pub fn run_git_commit(value: &str) {
+    let preference = load_auto_commit_value();
+    match preference.as_str() {
+        "enable" => {
+            let err_git_commit_message = "couldn't commit".red().to_string();
+            match cmd!("git", "commit", "-m", value.to_string()).read() {
+                Ok(result) => {
+                    println!("{}", "commited to the repo".on_bright_magenta().black());
+                    println!(
+                        "{}",
+                        "just run `git push` to push the changes to repo"
+                            .on_bright_magenta()
+                            .black()
+                    );
+                    return;
+                }
+                Err(_) => {
+                    println!("{}", err_git_commit_message);
+                    return;
+                }
+            }
+        }
+        "disable" => {
+            println!("{}", "autocommit is disabled".yellow());
+            println!("{}", "run `git-acm autocommit enable`".magenta());
+            return;
+        }
+        _ => {
+            println!("{}", "invalid value.");
+            return;
+        }
+    }
 }
