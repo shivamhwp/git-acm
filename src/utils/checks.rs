@@ -8,7 +8,7 @@ impl Check {
                 "{}",
                 "either export the key in terminal or define them in .env"
             );
-            return;
+            std::process::exit(1)
         }
     }
 
@@ -18,14 +18,14 @@ impl Check {
                 "{}",
                 "either export the key in terminal or define them in .env"
             );
-            return;
+            std::process::exit(1)
         }
     }
 
     pub fn is_prompt_empty(value: &str) {
         if value.is_empty() {
             println!("{}", "no prompt found".red());
-            return;
+            std::process::exit(1)
         }
     }
 
@@ -33,7 +33,21 @@ impl Check {
         if value.is_empty() {
             println!("{}", "🤔 are the stages changed ?".red());
             println!("{}", "💡 try `git add <file_name>`".red());
-            std::process::exit(1);
+            std::process::exit(1)
+        }
+    }
+
+    pub fn is_response_empty(value: &str) {
+        if value.is_empty() {
+            println!("{}", " no response, might be a server error".red());
+            std::process::exit(1)
+        }
+    }
+
+    pub fn is_model_name_empty(value: &str) {
+        if value.is_empty() {
+            println!("{}", "model_name not found".red());
+            std::process::exit(1)
         }
     }
 }

@@ -101,7 +101,7 @@ pub fn save_value(value: &str) {
     }
 }
 
-pub fn save_autcommit_preference(value: &str) {
+pub fn save_autocommit_preference(value: &str) {
     let auto_commit = get_config_dir().join("autocommit.txt");
     if config_exists().is_err() {
         println!("{}", "config doesn't exist ".red());
@@ -110,7 +110,7 @@ pub fn save_autcommit_preference(value: &str) {
 
     match fs::write(auto_commit, value) {
         Ok(_ok) => {
-            println!("{}{}", "autocommit ".green(), value)
+            println!("{}{}d", "autocommit ".green(), value)
         }
         Err(_e) => {
             println!("{}{}", value, "i couldn't save it, as a default. 😔".red())
@@ -144,11 +144,23 @@ pub fn get_api_url(value: &str, default: &str) -> String {
         }
     }
 }
+pub fn get_model_name(value: &str, default: &str) -> String {
+    let key = format!("{}_MODEL_NAME", value.to_uppercase());
+    match env::var(key) {
+        Ok(k) => {
+            return k.to_string();
+        }
+        Err(_e) => {
+            println!("{}", "couldn't get the model name ".red());
+            return default.to_string();
+        }
+    }
+}
 
 pub fn copy_to_clipboard(text: &str) -> Result<(), Box<dyn std::error::Error>> {
     match Clipboard::new()?.set_text(text) {
         Ok(_t) => {
-            println!("{}", "( automatically copied to clipboard 👍)".magenta());
+            println!("{}", "copied to clipboard 👍".magenta());
         }
         Err(_e) => {
             println!("{}", "( couldn't copy to clipboard 🥲 )".yellow());
@@ -158,18 +170,16 @@ pub fn copy_to_clipboard(text: &str) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 pub fn run_git_commit(value: &str) {
-    let preference = load_auto_commit_value();
+    let preference = value.to_string();
     match preference.as_str() {
         "enable" => {
             let err_git_commit_message = "couldn't commit".red().to_string();
             match cmd!("git", "commit", "-m", value.to_string()).read() {
-                Ok(result) => {
-                    println!("{}", "commited to the repo".on_bright_magenta().black());
+                Ok(_result) => {
+                    print!("{}.", "committed".magenta());
                     println!(
                         "{}",
-                        "just run `git push` to push the changes to repo"
-                            .on_bright_magenta()
-                            .black()
+                        " run `git push` to push the changes to repo".magenta()
                     );
                     return;
                 }
@@ -180,8 +190,8 @@ pub fn run_git_commit(value: &str) {
             }
         }
         "disable" => {
-            println!("{}", "autocommit is disabled".yellow());
-            println!("{}", "run `git-acm autocommit enable`".magenta());
+            // println!("{}", "autocommit is disabled".yellow());
+            // println!("{}", "run `git-acm autocommit enable`".magenta());
             return;
         }
         _ => {
@@ -189,4 +199,17 @@ pub fn run_git_commit(value: &str) {
             return;
         }
     }
+}
+
+pub fn print_to_cli(value: &str) {
+    let auto_commit_value = load_auto_commit_value();
+
+    if value.is_empty() {
+        println!("{}", "got no response".red());
+        std::process::exit(1)
+    }
+    println!("{}", value.blue());
+    copy_to_clipboard(value).unwrap_or_default();
+    run_git_commit(&auto_commit_value);
+    return;
 }
