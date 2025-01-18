@@ -11,9 +11,17 @@
 - [x] setup cli for diff apis
 - [x] github release.
 - [x] binary release.
+- [x] llama support.
+- [ ] option to choose models for the apis
 
 letting users choose the models will be more benificial. (set a default and let users choos.)
 
 think from first principles and think where there can be a problem.
 
 users should have at least friction as possible.
+
+what will be included in the v1.1.0
+
+- autocommit funtionality.
+- llama support.
+- maybe model options.

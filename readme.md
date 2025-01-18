@@ -25,7 +25,7 @@ cargo install git-acm
 
 1. ensure git is initialized in the dir. or run `git init`.
 2. add [gemini-api-key](https://aistudio.google.com/app/apikey) or [openai-api-key](https://platform.openai.com/api-keys) or [anthropic-api-key](https://console.anthropic.com/settings/keys)
-3. add these in your project's `.env` file or `export` them in terminal.
+3. add these in your project's `.env` file (preferred) or `export` them in terminal.
 
 ```
 # for gemini api
@@ -42,6 +42,12 @@ ANTHROPIC_API_KEY=""
 
 OPENAI_API_URL="https://api.openai.com/v1/chat/completions"
 OPENAI_API_KEY=""
+
+# for llama api (using ollama)
+
+LLAMA_API_URL="http://localhost:11434/api/generate"
+LLAMA_MODEL_NAME= "llama3.2:1b"
+
 
 ```
 
