@@ -1,4 +1,4 @@
-> this is for me to track the progress of the project.
+> this is for me to track the progress of the project. [ no real relation to the project. ]
 
 ## todo
 
@@ -12,11 +12,7 @@
 - [x] github release.
 - [x] binary release.
 - [x] llama support.
-- [ ] option to choose models for the apis
-
-letting users choose the models will be more benificial. (set a default and let users choos.)
-
-think from first principles and think where there can be a problem.
+- [ ] option to choose models for the apis - maybe later
 
 users should have at least friction as possible.
 
