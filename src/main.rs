@@ -1,5 +1,4 @@
 use clap::Command;
-use std::time::Instant;
 
 use models::{anthropic::anthropic, gemini::gemini, llama::llama, openai::openai};
 use utils::{
@@ -87,9 +86,6 @@ generate meaningful commit messages locally using AI. go to https://github.com/s
 fn get_commit_msg() {
     let model = load_value();
 
-    // todo remove this before publishing the version to crates.io and github package
-    let start_time = Instant::now();
-
     match model.as_str() {
         "openai" => {
             Check::is_response_empty(&openai());
@@ -116,9 +112,4 @@ fn get_commit_msg() {
             std::process::exit(1)
         }
     }
-
-    // todo remove this before publishing the version to crates.io and github package
-
-    let duration = start_time.elapsed();
-    println!("time taken : {} secs", duration.as_secs());
 }
