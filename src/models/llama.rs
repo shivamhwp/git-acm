@@ -4,46 +4,31 @@ use std::time::Duration;
 use yansi::Paint;
 
 use crate::utils::checks::Check;
-use crate::utils::config::{get_api_key, get_api_url};
+use crate::utils::config::{get_api_url, get_model_name};
 use crate::utils::diff::get_diff;
 
-pub fn gemini() -> String {
+pub fn llama() -> String {
     //checks if env exists
     dotenvy::dotenv().ok();
-    let api_url = get_api_url(
-        "gemini",
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
-    );
-    let api_key = get_api_key("gemini");
+    let api_url = get_api_url("llama", "");
+    let model_name = get_model_name("llama", "llama3.2:1b");
 
-    Check::api_key_present(&api_key);
     Check::api_url_present(&api_url);
+    Check::is_model_name_empty(&model_name);
 
     let prompt = include_str!("../../assets/prompt.txt");
     let full_diff = get_diff();
 
     Check::is_prompt_empty(prompt);
 
-    let uri = format!("{}?key={}", api_url, api_key);
+    let uri = format!("{}", api_url);
 
     let req_body = json!({
-      "tools": [],
-      "systemInstruction": {
-      "parts": [
-        {
-          "text": prompt
-        }
-      ]
-    },
-      "contents": [{
-          "parts": [
-              {
-                  "text": full_diff
-              }
-          ],
-          "role": "User"
-      }]
-      });
+    "model": model_name,
+    "system" : prompt,
+    "prompt": full_diff,
+    "stream": false
+    });
 
     let response = Request::post(uri)
         .header("Content-Type", "application/json")
@@ -56,7 +41,7 @@ pub fn gemini() -> String {
         Ok(mut res) => match res.text() {
             Ok(res) => {
                 let v: Value = serde_json::from_str(&res).unwrap();
-                let commit_msg = &v["candidates"][0]["content"]["parts"][0]["text"];
+                let commit_msg = &v["response"];
 
                 let final_msg = commit_msg.to_string();
                 let clear_msg = final_msg.trim().trim_matches(|c| c == '"' || c == '\n');
