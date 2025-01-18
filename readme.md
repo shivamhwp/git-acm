@@ -56,11 +56,19 @@ LLAMA_MODEL_NAME= "llama3.2:1b"
 
 ### 📍 commands available
 
-`use` : choose which api to run. options : `openai` | `anthropic` | `gemini`
+`use` : choose which api to run. options : `openai` | `anthropic` | `gemini` | `llama` .
 
-autosaves the one you chose in `~/.config/git-acm/model.txt` file.
+`autocommit` : enables or disables the autocommit functionality.
 
-→ to change just run the `use` command with the preferred api.
+### 📍 example
+
+```bash
+    git-acm use <api_name>       # Choose which API to use (openai, anthropic, gemini, llama)
+    git-acm autocommit enable    # Enable automatic commits with generated messages
+    git-acm autocommit disable   # Disable automatic commits
+    git-acm                      # Generate a commit message using the currently selected API
+
+```
 
 # Contributing
 

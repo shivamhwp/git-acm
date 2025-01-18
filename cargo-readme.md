@@ -38,6 +38,27 @@ ANTHROPIC_API_KEY=""
 OPENAI_API_URL="https://api.openai.com/v1/chat/completions"
 OPENAI_API_KEY=""
 
+# for llama api (using ollama)
+
+LLAMA_API_URL="http://localhost:11434/api/generate"
+LLAMA_MODEL_NAME= "llama3.2:1b"
+
 ```
 
 4. run `git-acm`.
+
+### 📍 commands available
+
+`use` : choose which api to run. options : `openai` | `anthropic` | `gemini` | `llama` .
+
+`autocommit` : enables or disables the autocommit functionality.
+
+### 📍 example
+
+```bash
+    git-acm use <api_name>       # Choose which API to use (openai, anthropic, gemini, llama)
+    git-acm autocommit enable    # Enable automatic commits with generated messages
+    git-acm autocommit disable   # Disable automatic commits
+    git-acm                      # Generate a commit message using the currently selected API
+
+```

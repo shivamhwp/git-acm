@@ -1,3 +1,10 @@
+### 1.1.0
+
+    - llama support 🎉
+    - llama model options.
+    - refactoring of code.
+    - autocommit feature added. 🎉
+
 ### 1.0.2
 
     - perf improvements.
