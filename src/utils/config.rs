@@ -170,7 +170,8 @@ pub fn copy_to_clipboard(text: &str) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 pub fn run_git_commit(value: &str) {
-    let preference = value.to_string();
+    let preference = load_auto_commit_value();
+    println!("{}", &preference);
     match preference.as_str() {
         "enable" => {
             let err_git_commit_message = "couldn't commit".red().to_string();
@@ -195,21 +196,35 @@ pub fn run_git_commit(value: &str) {
             return;
         }
         _ => {
-            println!("{}", "invalid value.");
+            println!("{}", "invalid autocommit value.".red());
+            println!(
+                "{}",
+                "run `git-acm autocommit disable` to resolve this error.".red()
+            );
             return;
         }
     }
 }
 
 pub fn print_to_cli(value: &str) {
-    let auto_commit_value = load_auto_commit_value();
-
     if value.is_empty() {
         println!("{}", "got no response".red());
         std::process::exit(1)
     }
     println!("{}", value.blue());
     copy_to_clipboard(value).unwrap_or_default();
-    run_git_commit(&auto_commit_value);
+
+    match load_auto_commit_value().as_str() {
+        "enable" => {
+            run_git_commit(&value);
+        }
+        "disable" => {}
+        _ => {
+            println!("{}", "invalid autocommit value.".red());
+            println!("{}", "cd ~/.config/git-acm. open the autocommit.txt file. and either write `enable` or `disable`.");
+            return;
+        }
+    }
+
     return;
 }
