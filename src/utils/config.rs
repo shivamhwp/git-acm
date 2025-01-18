@@ -171,7 +171,6 @@ pub fn copy_to_clipboard(text: &str) -> Result<(), Box<dyn std::error::Error>> {
 
 pub fn run_git_commit(value: &str) {
     let preference = load_auto_commit_value();
-    println!("{}", &preference);
     match preference.as_str() {
         "enable" => {
             let err_git_commit_message = "couldn't commit".red().to_string();
