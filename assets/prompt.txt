@@ -26,6 +26,7 @@ VALIDATIONS:
 3. Verify conventional commit format
 4. Ensure lowercase type
 5. No trailing punctuation
+6. Check number of characters <=50. ABSOLUTELY STRICT
 
 GOOD EXAMPLES:
 ✓ feat: Add user authentication 
