@@ -13,7 +13,7 @@ case "$(uname -s)" in
     Darwin*) PLATFORM="darwin";;
     MSYS*|MINGW*) PLATFORM="windows";;
     *)
-        echo "Unsupported platform: $(uname -s)"
+        echo "unsupported platform: $(uname -s)"
         exit 1
         ;;
 esac
@@ -38,23 +38,23 @@ TMP_FILE="${TMP_DIR}/${BINARY}"
 TMP_CHECKSUM="${TMP_DIR}/${BINARY}.sha256"
 
 # Download files
-progress "Downloading binary and checksum..."
+progress "downloading binary and checksum..."
 curl -sL "$DOWNLOAD_URL" -o "$TMP_FILE"
 curl -sL "$CHECKSUM_URL" -o "$TMP_CHECKSUM"
 
 # Verify checksum
-progress "Verifying checksum..."
+progress "verifying checksum..."
 if command -v sha256sum >/dev/null; then
     SHA256_CMD="sha256sum"
 elif command -v shasum >/dev/null; then
     SHA256_CMD="shasum -a 256"
 else
-    echo "Error: No sha256sum or shasum command found"
+    echo "error: No sha256sum or shasum command found"
     exit 1
 fi
 
 if ! (cd "$TMP_DIR" && $SHA256_CMD -c "${BINARY}.sha256"); then
-    echo "Error: Checksum verification failed"
+    echo "error: checksum verification failed"
     rm -rf "$TMP_DIR"
     exit 1
 fi
@@ -71,13 +71,13 @@ else
 fi
 
 # Install binary
-progress "Installing to $INSTALL_DIR..."
+progress "installing to $INSTALL_DIR..."
 mv "$TMP_FILE" "$INSTALL_DIR/git-acm"
 chmod 755 "$INSTALL_DIR/git-acm"
 
 # Handle macOS specific security
 if [ "$PLATFORM" = "darwin" ]; then
-    progress "Handling macOS security..."
+    progress "handling macOS security..."
     xattr -d com.apple.quarantine "$INSTALL_DIR/git-acm" 2>/dev/null || true
     # If using newer macOS versions, might need to add to security list
     if [ -x "/usr/bin/spctl" ]; then
@@ -98,9 +98,9 @@ fi
 # Cleanup
 rm -rf "$TMP_DIR"
 
-progress "Installation complete! You may need to:"
-progress "1. Run 'source ~/.zshrc' or restart your terminal"
+progress "installation complete! you may need to:"
+progress "1. run 'source ~/.zshrc' or restart your terminal"
 if [ "$PLATFORM" = "darwin" ]; then
-    progress "2. Go to System Preferences -> Security & Privacy and allow the binary if prompted"
+    progress "2. go to system preferences -> security & privacy and allow the binary if prompted"
 fi
-progress "Then try running: git-acm"
+progress "try running: git-acm"
