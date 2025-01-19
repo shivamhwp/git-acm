@@ -12,7 +12,8 @@
 - [x] github release.
 - [x] binary release.
 - [x] llama support.
-- [ ] option to choose models for the apis - maybe later
+- [ ] option to choose models for the apis
+- [ ] let user choose the msg or rerun to get another message > and then accept it.
 
 users should have at least friction as possible.
 
