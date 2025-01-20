@@ -6,6 +6,8 @@ _instant meaningful git commit messages, locally with AI_.
 
 written in rust btw.
 
+docs 📄 : [git-acm.pages.dev](https://git-acm.pages.dev)
+
 ### installation
 
 ```
