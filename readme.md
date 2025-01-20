@@ -4,8 +4,6 @@
 
 _instant meaningful git commit messages, locally with AI_.
 
-upvote it on peerlist : [upvote on peerlist ⬆️](https://peerlist.io/shivamhwp/project/gitacm)
-
 written in rust btw.
 
 ### installation
