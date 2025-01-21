@@ -19,7 +19,7 @@ cargo install git-acm
 
 ### how to use
 
-1. add [gemini-api-key](https://aistudio.google.com/app/apikey) or [openai-api-key](https://platform.openai.com/api-keys) or [anthropic-api-key](https://console.anthropic.com/settings/keys)
+1. add [gemini-api-key](https://aistudio.google.com/app/apikey) or [openai-api-key](https://platform.openai.com/api-keys) or [anthropic-api-key](https://console.anthropic.com/settings/keys) or [deepseek-api-key](https://platform.deepseek.com/api_keys)
 2. add these in your project's `.env` file or `export` them in terminal.
 
 ```
@@ -43,13 +43,18 @@ OPENAI_API_KEY=""
 LLAMA_API_URL="http://localhost:11434/api/generate"
 LLAMA_MODEL_NAME= "llama3.2:1b"
 
+# for deepseek api
+
+DEEPSEEEK_API_URL="https://api.deepseek.com/chat/completions"
+DEEPSEEEK_API_KEY=""
+
 ```
 
 4. run `git-acm`.
 
 ### 📍 commands available
 
-`use` : choose which api to run. options : `openai` | `anthropic` | `gemini` | `llama` .
+`use` : choose which api to run. options : `openai` | `anthropic` | `gemini` | `llama` | `deepseek` .
 
 `autocommit` : enables or disables the autocommit functionality.
 

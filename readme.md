@@ -14,6 +14,8 @@ docs 📄 : [git-acm.pages.dev](https://git-acm.pages.dev)
 curl -sSL https://raw.githubusercontent.com/shivamhwp/git-acm/main/install.sh | sh
 ```
 
+> to update : just run the installation command, it checks the system for prev version and then installs a new version if there's one.
+
 or
 if you have `cargo` installed on your system.
 
@@ -24,7 +26,7 @@ cargo install git-acm
 ### how to use
 
 1. ensure git is initialized in the dir. or run `git init`.
-2. add [gemini-api-key](https://aistudio.google.com/app/apikey) or [openai-api-key](https://platform.openai.com/api-keys) or [anthropic-api-key](https://console.anthropic.com/settings/keys)
+2. add [gemini-api-key](https://aistudio.google.com/app/apikey) or [openai-api-key](https://platform.openai.com/api-keys) or [anthropic-api-key](https://console.anthropic.com/settings/keys) or [deepseek-api-key](https://platform.deepseek.com/api_keys)
 3. add these in your project's `.env` file (preferred) or `export` them in terminal.
 
 ```
@@ -48,6 +50,10 @@ OPENAI_API_KEY=""
 LLAMA_API_URL="http://localhost:11434/api/generate"
 LLAMA_MODEL_NAME= "llama3.2:1b"
 
+# for deepseek api
+
+DEEPSEEEK_API_URL="https://api.deepseek.com/chat/completions"
+DEEPSEEEK_API_KEY=""
 
 ```
 
@@ -56,14 +62,14 @@ LLAMA_MODEL_NAME= "llama3.2:1b"
 
 ### 📍 commands available
 
-`use` : choose which api to run. options : `openai` | `anthropic` | `gemini` | `llama` .
+`use` : choose which api to run. options : `openai` | `anthropic` | `gemini` | `llama` | `deepseek`.
 
 `autocommit` : enables or disables the autocommit functionality.
 
 ### 📍 example
 
 ```bash
-    git-acm use <api_name>       # Choose which API to use (openai, anthropic, gemini, llama)
+    git-acm use <api_name>       # Choose which API to use (openai, anthropic, gemini, llama, deepseek)
     git-acm autocommit enable    # Enable automatic commits with generated messages
     git-acm autocommit disable   # Disable automatic commits
     git-acm                      # Generate a commit message using the currently selected API
@@ -81,7 +87,7 @@ LLAMA_MODEL_NAME= "llama3.2:1b"
    ```
 
 2. get [gemini-api-credentials](https://aistudio.google.com/app/apikey) or [openai-api-credentials](https://platform.openai.com/api-keys) or [anthropic-api-credentials](https://console.anthropic.com/settings/keys). see [.env.example](https://github.com/shivamhwp/git-acm/blob/main/.env.example)
-3. create `.env` file at root > set `GEMINI_API_KEY=" " `.
+3. create `.env` file at root > set `GEMINI_API_KEY=" " ` or any other provider's key.
 4. ```bash
     cargo build
    ```

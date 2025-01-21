@@ -1,6 +1,8 @@
 use clap::Command;
 
-use models::{anthropic::anthropic, gemini::gemini, llama::llama, openai::openai};
+use models::{
+    anthropic::anthropic, deepseek::deepseek, gemini::gemini, llama::llama, openai::openai,
+};
 use utils::{
     checks::Check,
     config::{load_value, print_to_cli, save_autocommit_preference, save_value},
@@ -30,6 +32,7 @@ generate meaningful commit messages locally using AI. go to https://github.com/s
                 .subcommand(Command::new("anthropic"))
                 .subcommand(Command::new("gemini"))
                 .subcommand(Command::new("llama"))
+                .subcommand(Command::new("deepseek"))
                 .override_help("choose from openai, anthropic, gemini and llama."),
         )
         .subcommand(
@@ -51,11 +54,13 @@ generate meaningful commit messages locally using AI. go to https://github.com/s
                 Some(("anthropic", _)) => save_value("anthropic"),
                 Some(("gemini", _)) => save_value("gemini"),
                 Some(("llama", _)) => save_value("llama"),
+                Some(("deepseek", _)) => save_value("deepseek"),
                 _ => {
                     println!("{}", "choose an api to make requests.".red());
                     println!(
                         "{}",
-                        "available options: [ openai | anthropic | gemini | llama ] ".yellow()
+                        "available options: [ openai | anthropic | gemini | llama | deepseek ] "
+                            .yellow()
                     );
                     return;
                 }
@@ -103,11 +108,15 @@ fn get_commit_msg() {
             Check::is_response_empty(&llama());
             print_to_cli(&llama());
         }
+        "deepseek" => {
+            Check::is_response_empty(&deepseek());
+            print_to_cli(&deepseek());
+        }
         _ => {
             println!("{}", "   no default api found.".red());
             println!(
                 "{}",
-                "💡 choose from [ openai | anthropic | gemini | llama ].".green()
+                "💡 choose from [ openai | anthropic | gemini | llama | deepseek ].".green()
             );
             std::process::exit(1)
         }
