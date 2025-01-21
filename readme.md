@@ -1,6 +1,7 @@
 # git-acm - git auto-commit-message
 
-![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/shivamhwp/git-acm/release.yml)
+![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm?labelColor=%23222&color=white)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/shivamhwp/git-acm/release.yml?labelColor=%23222&color=white)
 
 _instant meaningful git commit messages, locally with AI_.
 

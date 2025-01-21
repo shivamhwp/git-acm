@@ -16,9 +16,3 @@
 - [ ] let user choose the msg or rerun to get another message > and then accept it.
 
 users should have at least friction as possible.
-
-what will be included in the v1.1.0
-
-- autocommit funtionality.
-- llama support.
-- maybe model options.
