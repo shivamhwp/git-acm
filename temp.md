@@ -12,6 +12,8 @@
 - [x] github release.
 - [x] binary release.
 - [x] llama support.
-- [ ] let user choose the msg or rerun to get another message > and then accept it.
+- [x] let user choose the msg or rerun to get another message > and then accept it.
+
+most of the features had been added, it will get regular(model) updates as usual. i'll be focusing on other projects in the meantime.
 
 users should have at least friction as possible.

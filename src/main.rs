@@ -22,7 +22,7 @@ generate meaningful commit messages locally using AI. go to https://github.com/s
 
     let cli = Command::new("git-acm")
         .author("shivam [shivam.ing]")
-        .version("1.1.0") // similar to cargo.toml file.
+        .version("1.1.1") // similar to cargo.toml file.
         .about(description)
         .subcommand(
             Command::new("use")
