@@ -1,4 +1,8 @@
 use arboard::Clipboard;
+use crossterm::{
+    event::{self, Event, KeyCode, KeyEventKind},
+    terminal::{disable_raw_mode, enable_raw_mode},
+};
 use duct::cmd;
 use std::{
     env, fs,
@@ -7,6 +11,8 @@ use std::{
 };
 
 use yansi::Paint;
+
+use crate::get_commit_msg;
 
 fn get_config_dir() -> PathBuf {
     let home = env::var("HOME").unwrap_or_else(|_| ".".to_string());
@@ -68,7 +74,7 @@ pub fn load_auto_commit_value() -> String {
     if !auto_commit.exists() {
         if let Err(e) = fs::write(&auto_commit, "disable") {
             println!("{}", format!("error with autocommit.txt file {}", e).red());
-            return "disable".to_string();
+            return String::from("disable");
         }
     }
 
@@ -79,7 +85,7 @@ pub fn load_auto_commit_value() -> String {
                 "{}",
                 format!("Error reading autocommit, set as disable {}", e).red()
             );
-            return "disable".to_string();
+            return String::from("disable");
         }
     }
 }
@@ -123,11 +129,11 @@ pub fn get_api_key(value: &str) -> String {
 
     match env::var(key) {
         Ok(k) => {
-            return k.to_string();
+            return String::from(k);
         }
         Err(_e) => {
             println!("{}", "couldn't get the api key".red());
-            return "".to_string();
+            return String::from("disable");
         }
     }
 }
@@ -136,23 +142,23 @@ pub fn get_api_url(value: &str, default: &str) -> String {
     let key = format!("{}_API_URL", value.to_uppercase());
     match env::var(key) {
         Ok(k) => {
-            return k.to_string();
+            return String::from(k);
         }
         Err(_e) => {
             println!("{}", "couldn't get the api url ".red());
-            return default.to_string();
+            return String::from(default);
         }
     }
 }
-pub fn get_model_name(value: &str, default: &str) -> String {
+pub fn get_api_name(value: &str, default: &str) -> String {
     let key = format!("{}_MODEL_NAME", value.to_uppercase());
     match env::var(key) {
         Ok(k) => {
-            return k.to_string();
+            return String::from(k);
         }
         Err(_e) => {
             println!("{}", "couldn't get the model name ".red());
-            return default.to_string();
+            return String::from(default);
         }
     }
 }
@@ -179,12 +185,12 @@ pub fn run_git_commit(value: &str) {
                     print!("{}.", "committed".magenta());
                     println!(
                         "{}",
-                        " run `git push` to push the changes to repo".magenta()
+                        " run `git push` to push the changes to the repo".magenta()
                     );
                     return;
                 }
-                Err(_) => {
-                    println!("{}", err_git_commit_message);
+                Err(e) => {
+                    println!("{} error : {}", err_git_commit_message, e);
                     return;
                 }
             }
@@ -196,10 +202,7 @@ pub fn run_git_commit(value: &str) {
         }
         _ => {
             println!("{}", "invalid autocommit value.".red());
-            println!(
-                "{}",
-                "run `git-acm autocommit disable` to resolve this error.".red()
-            );
+            println!("{}", "cd ~/.config/git-acm. open the autocommit.txt file. and either write `enable` or `disable`.");
             return;
         }
     }
@@ -209,21 +212,58 @@ pub fn print_to_cli(value: &str) {
     if value.is_empty() {
         println!("{}", "got no response".red());
         std::process::exit(1)
-    }
-    println!("{}", value.blue());
-    copy_to_clipboard(value).unwrap_or_default();
-
-    match load_auto_commit_value().as_str() {
-        "enable" => {
-            run_git_commit(&value);
-        }
-        "disable" => {}
-        _ => {
-            println!("{}", "invalid autocommit value.".red());
-            println!("{}", "cd ~/.config/git-acm. open the autocommit.txt file. and either write `enable` or `disable`.");
-            return;
+    } else {
+        println!("{}", value.blue());
+        match msg_handler(value, false) {
+            Ok(_v) => {}
+            _ => {
+                println!("{}", "invalid input".red());
+                std::process::exit(1);
+            }
         }
     }
 
     return;
+}
+
+// this fn takes a str as input and watches for the return or r key based on which wither it calls the commit getter again or accepts the result.
+pub fn msg_handler(value: &str, in_handler: bool) -> Result<(), Error> {
+    println!(
+        "{}",
+        "press [enter] to accept or [r] to get a new commit message".magenta()
+    );
+    enable_raw_mode()?;
+    loop {
+        if let Event::Key(key) = event::read()? {
+            if key.kind == KeyEventKind::Press {
+                match key.code {
+                    KeyCode::Enter => {
+                        disable_raw_mode()?;
+                        println!("{}", value);
+                        // the follwing fns are here. so that these only run once.
+                        copy_to_clipboard(value).unwrap_or_else(|_x| {
+                            println!("{}", "error copying the result to clipboard".yellow())
+                        });
+                        run_git_commit(value);
+                        return Ok(());
+                    }
+                    KeyCode::Char('r') => {
+                        disable_raw_mode()?;
+                        println!("{}", "getting a new message 🧪".green());
+                        if !in_handler {
+                            //  to prevent the infinite loop
+                            get_commit_msg();
+                        }
+                        return Ok(());
+                    }
+                    _ => {
+                        disable_raw_mode()?;
+                        println!("{}", "invalid input".red());
+                        std::process::exit(1);
+                    }
+                }
+            }
+        }
+        disable_raw_mode()?;
+    }
 }

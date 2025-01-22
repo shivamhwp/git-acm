@@ -4,7 +4,6 @@ use models::{
     anthropic::anthropic, deepseek::deepseek, gemini::gemini, llama::llama, openai::openai,
 };
 use utils::{
-    checks::Check,
     config::{load_value, print_to_cli, save_autocommit_preference, save_value},
     diff::is_git_initialized,
 };
@@ -93,23 +92,18 @@ fn get_commit_msg() {
 
     match model.as_str() {
         "openai" => {
-            Check::is_response_empty(&openai());
             print_to_cli(&openai());
         }
         "anthropic" => {
-            Check::is_response_empty(&anthropic());
-            print_to_cli(&openai());
+            print_to_cli(&anthropic());
         }
         "gemini" => {
-            Check::is_response_empty(&gemini());
             print_to_cli(&gemini());
         }
         "llama" => {
-            Check::is_response_empty(&llama());
             print_to_cli(&llama());
         }
         "deepseek" => {
-            Check::is_response_empty(&deepseek());
             print_to_cli(&deepseek());
         }
         _ => {
