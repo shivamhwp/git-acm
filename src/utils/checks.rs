@@ -37,12 +37,12 @@ impl Check {
         }
     }
 
-    pub fn is_response_empty(value: &str) {
-        if value.is_empty() {
-            println!("{}", " no response, might be a server error".red());
-            std::process::exit(1)
-        }
-    }
+    // pub fn is_response_empty(value: &str) {
+    //     if value.is_empty() {
+    //         println!("{}", " no response, might be a server error".red());
+    //         std::process::exit(1)
+    //     }
+    // }
 
     pub fn is_model_name_empty(value: &str) {
         if value.is_empty() {
