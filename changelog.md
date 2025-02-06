@@ -4,7 +4,9 @@
 
 ### 1.1.1
 
-    - deepseek support
+    -  deepseek api support
+    -  rerun feature : [enter] to accept, [r] to rerun and get a new message.
+    -  a lil bit of cleaning.
 
 ### 1.1.0
 
