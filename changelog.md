@@ -1,3 +1,11 @@
+### 1.1.2
+
+    - gemini 2.0 flash upgrade
+
+### 1.1.1
+
+    - deepseek support
+
 ### 1.1.0
 
     - llama support 🎉

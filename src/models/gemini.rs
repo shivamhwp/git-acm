@@ -12,7 +12,7 @@ pub fn gemini() -> String {
     dotenvy::dotenv().ok();
     let api_url = get_api_url(
         "gemini",
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
     );
     let api_key = get_api_key("gemini");
 
@@ -47,7 +47,7 @@ pub fn gemini() -> String {
 
     let response = Request::post(uri)
         .header("Content-Type", "application/json")
-        .timeout(Duration::from_secs(10))
+        .timeout(Duration::from_secs(15))
         .body(req_body.to_string())
         .unwrap()
         .send();
