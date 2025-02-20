@@ -9,6 +9,8 @@ written in rust btw.
 
 docs 📄 : [git-acm.pages.dev](https://git-acm.pages.dev)
 
+crates.io : [https://crates.io/crates/git-acm](https://crates.io/crates/git-acm)
+
 ### installation
 
 ```
