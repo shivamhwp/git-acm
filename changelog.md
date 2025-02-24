@@ -1,3 +1,7 @@
+### 1.1.3
+
+    - update claude-3.5 to claude 3.7
+
 ### 1.1.2
 
     - gemini 2.0 flash upgrade
