@@ -23,7 +23,7 @@ pub fn anthropic() -> String {
     let uri = format!("{}?key={}", api_url, api_key);
 
     let req_body = json!({
-    "model": "claude-3-5-sonnet-20241022",
+    "model": "claude-3-7-sonnet-20250219",
     "max_tokens": 60,
     "system": [
        {
