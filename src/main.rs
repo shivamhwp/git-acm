@@ -15,14 +15,14 @@ mod utils;
 fn main() {
     is_git_initialized();
     let description = "
-generate meaningful commit messages locally using AI. go to https://github.com/shivamhwp/git-acm for more details."
+generate meaningful commit messages locally using AI. go to https://git.new/git-acm for more details."
         .magenta().bold()
         .to_string();
     // let run_command = "explicit run command, does the same thing as running `git-acm`";
 
     let cli = Command::new("git-acm")
         .author("shivam [shivam.ing]")
-        .version("1.1.3") // similar to cargo.toml file.
+        .version("1.1.4") // similar to cargo.toml file.
         .about(description)
         .subcommand(
             Command::new("use")

@@ -24,7 +24,7 @@ pub fn deepseek() -> String {
     let uri = format!("{}?key={}", api_url, api_key);
 
     let req_body = json!({
-      "model": "deepseek-chat",
+      "model": "deepseek-coder",
       "stream_options": null,
       "max_tokens" : 200,
       "messages": [

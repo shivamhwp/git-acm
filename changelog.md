@@ -1,3 +1,8 @@
+### 1.1.4
+
+    - [q] to quit the msg_handler.
+    -  minor updates.
+
 ### 1.1.3
 
     - update claude-3.5 to claude 3.7

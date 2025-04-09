@@ -230,7 +230,7 @@ pub fn print_to_cli(value: &str) {
 pub fn msg_handler(value: &str, in_handler: bool) -> Result<(), Error> {
     println!(
         "{}",
-        "press [enter] to accept or [r] to get a new commit message".magenta()
+        "[enter]: accept | [r]: get a new commit message | [q]: exit".magenta()
     );
     enable_raw_mode()?;
     loop {
@@ -249,12 +249,17 @@ pub fn msg_handler(value: &str, in_handler: bool) -> Result<(), Error> {
                     }
                     KeyCode::Char('r') => {
                         disable_raw_mode()?;
-                        println!("{}", "getting a new message 🧪".green());
+                        println!("{}", "getting a new message...".green());
                         if !in_handler {
                             //  to prevent the infinite loop
                             get_commit_msg();
                         }
                         return Ok(());
+                    }
+                    KeyCode::Char('q') => {
+                        disable_raw_mode()?;
+                        println!("{}", "exiting...".green());
+                        std::process::exit(0);
                     }
                     _ => {
                         disable_raw_mode()?;

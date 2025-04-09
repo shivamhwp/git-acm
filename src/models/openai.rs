@@ -54,6 +54,7 @@ pub fn openai() -> String {
         .unwrap()
         .send();
 
+
     match response {
         Ok(mut res) => match res.text() {
             Ok(res) => {
