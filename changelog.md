@@ -2,6 +2,7 @@
 
     - [q] to quit the msg_handler.
     -  minor updates.
+    -  deepseek-chat -> deepseek-coder
 
 ### 1.1.3
 
