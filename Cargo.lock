@@ -483,7 +483,7 @@ dependencies = [
 
 [[package]]
 name = "git-acm"
-version = "1.2.4"
+version = "1.2.0"
 dependencies = [
  "arboard",
  "clap",

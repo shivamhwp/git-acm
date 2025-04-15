@@ -1,9 +1,9 @@
 # git-acm - git auto-commit-message
 
+### instant meaningful commit messages
+
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm?labelColor=%23222&color=white)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/shivamhwp/git-acm/release.yml?labelColor=%23222&color=white)
-
-_generate meaningful commit messages locally using AI_.
 
 ### installation
 
@@ -26,17 +26,14 @@ cargo install git-acm
 ```
 # for gemini api
 
-GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 GEMINI_API_KEY=""
 
 # for anthropic api
 
-ANTHROPIC_API_URL="https://api.anthropic.com/v1/messages"
 ANTHROPIC_API_KEY=""
 
 # for openai api
 
-OPENAI_API_URL="https://api.openai.com/v1/chat/completions"
 OPENAI_API_KEY=""
 
 # for llama api (using ollama)
@@ -46,7 +43,6 @@ LLAMA_MODEL_NAME= "llama3.2:1b"
 
 # for deepseek api
 
-DEEPSEEEK_API_URL="https://api.deepseek.com/chat/completions"
 DEEPSEEEK_API_KEY=""
 
 ```
@@ -55,16 +51,19 @@ DEEPSEEEK_API_KEY=""
 
 ### 📍 commands available
 
-`use` : choose which api to run. options : `openai` | `anthropic` | `gemini` | `llama` | `deepseek` .
+`use` : choose which model you want to use. (run `git-acm list` to see the available models).
 
 `autocommit` : enables or disables the autocommit functionality.
+
+`list` : lists all available models.
 
 ### 📍 example
 
 ```bash
-    git-acm use <api_name>       # Choose which API to use (openai, anthropic, gemini, llama)
-    git-acm autocommit enable    # Enable automatic commits with generated messages
-    git-acm autocommit disable   # Disable automatic commits
-    git-acm                      # Generate a commit message using the currently selected API
+git-acm use <model_name>     # choose which model to use.
+git-acm list 				 # list all the models.
+git-acm autocommit enable    # Enable automatic commits with generated messages
+git-acm autocommit disable   # Disable automatic commits
+git-acm                      # Generate a commit message using the currently selected API
 
 ```

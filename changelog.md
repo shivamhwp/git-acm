@@ -1,6 +1,12 @@
+### 1.2.0
+
+    - a huge refactor
+    - updated and simple model selection system.
+    - let's you choose from different models.
+
 ### 1.1.4
 
-    - [q] to quit the msg_handler.
+    -  [q] to quit the msg_handler.
     -  minor updates.
     -  deepseek-chat -> deepseek-coder
 

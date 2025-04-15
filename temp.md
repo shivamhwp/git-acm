@@ -13,6 +13,7 @@
 - [x] binary release.
 - [x] llama support.
 - [x] let user choose the msg or rerun to get another message > and then accept it.
+- [x] refactor + simple model selector.
 
 most of the features had been added, it will get regular(model) updates as usual. i'll be focusing on other projects in the meantime.
 
