@@ -4,13 +4,13 @@ use std::time::Duration;
 use yansi::Paint;
 
 use crate::utils::checks::Check;
-use crate::utils::config::{get_api_key, get_api_url};
+use crate::utils::config::{get_api_key, load_model_from_pref};
 use crate::utils::diff::get_diff;
 
 pub fn openai() -> String {
     //checks if env exists
     dotenvy::dotenv().ok();
-    let api_url = get_api_url("openai", "https://api.openai.com/v1/chat/completions");
+    let api_url = "https://api.openai.com/v1/chat/completions";
     let api_key = get_api_key("openai");
 
     Check::api_key_present(&api_key);
@@ -21,9 +21,10 @@ pub fn openai() -> String {
 
     Check::is_prompt_empty(prompt);
     let uri = format!("{}?key={}", api_url, api_key);
+    let model = load_model_from_pref(Some("openai"));
 
     let req_body = json!({
-        "model": "gpt-4o",
+        "model": model,
         "messages": [
             {
                 "role": "developer",

@@ -4,13 +4,13 @@ use std::time::Duration;
 use yansi::Paint;
 
 use crate::utils::checks::Check;
-use crate::utils::config::{get_api_key, get_api_url};
+use crate::utils::config::{get_api_key, load_model_from_pref};
 use crate::utils::diff::get_diff;
 
 pub fn anthropic() -> String {
     //checks if env exists
     dotenvy::dotenv().ok();
-    let api_url = get_api_url("anthropic", "https://api.anthropic.com/v1/messages");
+    let api_url = "https://api.anthropic.com/v1/messages";
     let api_key = get_api_key("anthropic");
     Check::api_key_present(&api_key);
     Check::api_url_present(&api_url);
@@ -22,8 +22,12 @@ pub fn anthropic() -> String {
 
     let uri = format!("{}?key={}", api_url, api_key);
 
+    // this will always load anthropic model from the config file, coz it's only called when the model_provider is anthropic.
+    let model = load_model_from_pref(Some("anthropic"));
+
+
     let req_body = json!({
-    "model": "claude-3-7-sonnet-20250219",
+    "model": model,
     "max_tokens": 60,
     "system": [
        {

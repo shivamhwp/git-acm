@@ -38,3 +38,7 @@ so solving the msg choosing and running feature, so if we think what could be th
 user gets the msg from the response > [enter] to choose and [r] to rerun and get another msg.
 
 so a fn that takes a string as input and watches for keycodes, based on which either it calls the function or returns the result.
+
+todo
+
+[ ] revamp the structure and let user directly put model names and we figure out the rest.

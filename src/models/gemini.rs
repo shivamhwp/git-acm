@@ -4,20 +4,22 @@ use std::time::Duration;
 use yansi::Paint;
 
 use crate::utils::checks::Check;
-use crate::utils::config::{get_api_key, get_api_url};
+use crate::utils::config::{get_api_key, load_model_from_pref   };
 use crate::utils::diff::get_diff;
 
 pub fn gemini() -> String {
     //checks if env exists
     dotenvy::dotenv().ok();
-    let api_url = get_api_url(
-        "gemini",
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
-    );
+    
+    let model = load_model_from_pref(Some("gemini"));
+
+    let api_url = format!("https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent", model);
+
     let api_key = get_api_key("gemini");
 
     Check::api_key_present(&api_key);
     Check::api_url_present(&api_url);
+
 
     let prompt = include_str!("../../assets/prompt.txt");
     let full_diff = get_diff();

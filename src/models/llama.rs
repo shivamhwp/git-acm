@@ -4,14 +4,14 @@ use std::time::Duration;
 use yansi::Paint;
 
 use crate::utils::checks::Check;
-use crate::utils::config::{get_api_name, get_api_url};
+use crate::utils::config::{get_api_url, load_model_from_pref};
 use crate::utils::diff::get_diff;
 
 pub fn llama() -> String {
     //checks if env exists
     dotenvy::dotenv().ok();
     let api_url = get_api_url("llama", "");
-    let model_name = get_api_name("llama", "llama3.2:1b");
+    let model_name = load_model_from_pref(Some("llama"));
 
     Check::api_url_present(&api_url);
     Check::is_model_name_empty(&model_name);

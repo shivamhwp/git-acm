@@ -1,104 +1,104 @@
 {
-  "openai": {
-    "models": [
-      {
-        "model_api_name": "o1-2024-12-17",
-        "model_name": "o1"
-      },
-      {
-        "model_api_name": "chatgpt-4o-latest",
-        "model_name": "gpt-4o"
-      },
-      {
-        "model_api_name": "gpt-4.1-2025-04-14",
-        "model_name": "gpt-4.1"
-      },
-      {
-        "model_api_name": "o1-pro-2025-03-19",
-        "model_name": "o1-pro"
-      },
-      {
-        "model_api_name": "gpt-4.1-mini-2025-04-14",
-        "model_name": "gpt-4.1-mini"
-      },
-      {
-        "model_api_name": "gpt-4.1-nano-2025-04-14",
-        "model_name": "gpt-4.1-nano"
-      }
-    ]
-  },
-  "anthropic": {
-    "models": [
-      {
-        "model_api_name": "claude-3-7-sonnet-latest",
-        "model_name": "claude-3-7-sonnet"
-      },
-      {
-        "model_api_name": "claude-3-5-sonnet-latest",
-        "model_name": "claude-3-5-sonnet"
-      },
-      {
-        "model_api_name": "claude-3-5-haiku-latest",
-        "model_name": "claude-3-5-haiku"
-      }
-    ]
-  },
-  "google": {
-    "models": [
-      {
-        "model_api_name": "gemini-2.5-pro-preview-03-25",
-        "model_name": "gemini-2.5-pro"
-      },
-      {
-        "model_api_name": "gemini-2.0-flash",
-        "model_name": "gemini-2.0-flash"
-      },
-      {
-        "model_api_name": "gemini-2.0-flash-lite",
-        "model_name": "gemini-2.0-flash-lite"
-      }
-    ]
-  },
-
-  "deepseek": {
-    "models": [
-      {
-        "model_api_name": "deepseek-chat",
-        "model_name": "deepseek-chat"
-      },
-      {
-        "model_api_name": "deepseek-reasoner",
-        "model_name": "deepseek-reasoner"
-      }
-    ]
-  },
-
-  "meta": {
-    "models": [
-      {
-        "model_api_name": "llama-4-scout",
-        "model_name": "llama-4-scout"
-      },
-      {
-        "model_api_name": "llama-4-maverick",
-        "model_name": "llama-4-maverick"
-      },
-      {
-        "model_api_name": "llama-3.3-70b-instruct",
-        "model_name": "llama-3.3-70b-instruct"
-      },
-      {
-        "model_api_name": "llama-3.1-8b-instruct",
-        "model_name": "llama-3.1-8b-instruct"
-      },
-      {
-        "model_api_name": "llama-3.1-70b-instruct",
-        "model_name": "llama-3.1-70b-instruct"
-      },
-      {
-        "model_api_name": "llama-3.2-3b-instruct",
-        "model_name": "llama-3.2-3b-instruct"
-      }
-    ]
-  }
+  "models": [
+    {
+      "model_api_name": "o1-2024-12-17",
+      "model_name": "o1",
+      "provider": "openai"
+    },
+    {
+      "model_api_name": "chatgpt-4o-latest",
+      "model_name": "gpt-4o",
+      "provider": "openai"
+    },
+    {
+      "model_api_name": "gpt-4.1-2025-04-14",
+      "model_name": "gpt-4.1",
+      "provider": "openai"
+    },
+    {
+      "model_api_name": "o1-pro-2025-03-19",
+      "model_name": "o1-pro",
+      "provider": "openai"
+    },
+    {
+      "model_api_name": "gpt-4.1-mini-2025-04-14",
+      "model_name": "gpt-4.1-mini",
+      "provider": "openai"
+    },
+    {
+      "model_api_name": "gpt-4.1-nano-2025-04-14",
+      "model_name": "gpt-4.1-nano",
+      "provider": "openai"
+    },
+    {
+      "model_api_name": "claude-3-7-sonnet-latest",
+      "model_name": "claude-3.7-sonnet",
+      "provider": "anthropic"
+    },
+    {
+      "model_api_name": "claude-3-5-sonnet-latest",
+      "model_name": "claude-3.5-sonnet",
+      "provider": "anthropic"
+    },
+    {
+      "model_api_name": "claude-3-5-haiku-latest",
+      "model_name": "claude-3.5-haiku",
+      "provider": "anthropic"
+    },
+    {
+      "model_api_name": "gemini-2.5-pro-preview-03-25",
+      "model_name": "gemini-2.5-pro",
+      "provider": "gemini"
+    },
+    {
+      "model_api_name": "gemini-2.0-flash",
+      "model_name": "gemini-2.0-flash",
+      "provider": "gemini"
+    },
+    {
+      "model_api_name": "gemini-2.0-flash-lite",
+      "model_name": "gemini-2.0-flash-lite",
+      "provider": "gemini"
+    },
+    {
+      "model_api_name": "deepseek-chat",
+      "model_name": "deepseek-chat",
+      "provider": "deepseek"
+    },
+    {
+      "model_api_name": "deepseek-reasoner",
+      "model_name": "deepseek-reasoner",
+      "provider": "deepseek"
+    },
+    {
+      "model_api_name": "llama-4-scout",
+      "model_name": "llama-4-scout",
+      "provider": "llama"
+    },
+    {
+      "model_api_name": "llama-4-maverick",
+      "model_name": "llama-4-maverick",
+      "provider": "llama"
+    },
+    {
+      "model_api_name": "llama-3.3-70b-instruct",
+      "model_name": "llama-3.3-70b-instruct",
+      "provider": "llama"
+    },
+    {
+      "model_api_name": "llama-3.1-8b-instruct",
+      "model_name": "llama-3.1-8b-instruct",
+      "provider": "llama"
+    },
+    {
+      "model_api_name": "llama-3.1-70b-instruct",
+      "model_name": "llama-3.1-70b-instruct",
+      "provider": "llama"
+    },
+    {
+      "model_api_name": "llama-3.2-3b-instruct",
+      "model_name": "llama-3.2-3b-instruct",
+      "provider": "llama"
+    }
+  ]
 }

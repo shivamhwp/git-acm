@@ -483,7 +483,7 @@ dependencies = [
 
 [[package]]
 name = "git-acm"
-version = "1.1.4"
+version = "1.2.4"
 dependencies = [
  "arboard",
  "clap",
@@ -491,6 +491,7 @@ dependencies = [
  "dotenvy",
  "duct",
  "isahc",
+ "serde",
  "serde_json",
  "yansi",
 ]

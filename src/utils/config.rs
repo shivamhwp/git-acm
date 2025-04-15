@@ -12,7 +12,16 @@ use std::{
 
 use yansi::Paint;
 
-use crate::get_commit_msg;
+use crate::{get_commit_msg, Model};
+
+
+use serde::Deserialize;
+#[derive(Deserialize, Debug)]
+struct Models {
+    models: Vec<Model>,
+}
+
+
 
 fn get_config_dir() -> PathBuf {
     let home = env::var("HOME").unwrap_or_else(|_| ".".to_string());
@@ -27,32 +36,60 @@ fn config_exists() -> Result<(), Error> {
     Ok(())
 }
 
-pub fn load_value() -> String {
+pub fn load_model_from_pref(provider: Option<&str>) -> String {
     let config_file = get_config_dir().join("model.txt");
 
     if let Err(e) = config_exists() {
         println!(
             "{}",
             format!(
-                "Failed to create config dir, setting openai as default: {}",
+                "Failed to create config dir {}",
                 e
             )
             .red()
         );
-        return "openai".to_string();
+
+        
+        match provider {
+            Some(provider) => {
+                match provider {
+                    "anthropic" => {
+                        return "claude-3.5-sonnet".to_string();
+                    }
+                    "gemini" => {
+                        return "gemini-2.0-flash".to_string();
+                    }
+                    "deepseek" => {
+                        return "deepseek-chat".to_string();
+                    }
+                    "llama" => {
+                        return "llama-3.2-3b-instruct".to_string();
+                    }
+                    "openai" => {
+                        return "gpt-4.1".to_string();
+                    }
+                    _ => {
+                        return "gemini-2.0-flash".to_string();
+                    }
+                }
+            }
+            None => {
+                return "gemini-2.0-flash".to_string();
+            }
+        }
     }
 
     if !config_file.exists() {
-        if let Err(e) = fs::write(&config_file, "openai") {
+        if let Err(e) = fs::write(&config_file, "gemini-2.0-flash") {
             println!(
                 "{}",
                 format!(
-                    "Failed to create config file, setting openai as default {}",
+                    "Failed to create config file, setting gemini 2.5 pro as default {}",
                     e
                 )
                 .red()
             );
-            return "openai".to_string();
+            return "gemini-2.0-flash".to_string();
         }
     }
 
@@ -61,11 +98,11 @@ pub fn load_value() -> String {
         Err(e) => {
             println!(
                 "{}",
-                format!("Error reading config, using openai as default {}", e).red()
+                format!("Error reading config, using gemini-2.0-flash as default {}", e).red()
             );
-            "openai".to_string()
+            "gemini-2.0-flash".to_string()
         }
-    }
+    }   
 }
 
 pub fn load_auto_commit_value() -> String {
@@ -90,7 +127,8 @@ pub fn load_auto_commit_value() -> String {
     }
 }
 
-pub fn save_value(value: &str) {
+
+pub fn save_model_value(value: &str) {
     if config_exists().is_err() {
         println!("{}", "config doesn't exist ".red());
         return;
@@ -150,18 +188,7 @@ pub fn get_api_url(value: &str, default: &str) -> String {
         }
     }
 }
-pub fn get_api_name(value: &str, default: &str) -> String {
-    let key = format!("{}_MODEL_NAME", value.to_uppercase());
-    match env::var(key) {
-        Ok(k) => {
-            return String::from(k);
-        }
-        Err(_e) => {
-            println!("{}", "couldn't get the model name ".red());
-            return String::from(default);
-        }
-    }
-}
+
 
 pub fn copy_to_clipboard(text: &str) -> Result<(), Box<dyn std::error::Error>> {
     match Clipboard::new()?.set_text(text) {
@@ -182,7 +209,7 @@ pub fn run_git_commit(value: &str) {
             let err_git_commit_message = "couldn't commit".red().to_string();
             match cmd!("git", "commit", "-m", value.to_string()).read() {
                 Ok(_result) => {
-                    print!("{}.", "committed".magenta());
+                    println!("{}.", "committed".magenta());
                     println!(
                         "{}",
                         " run `git push` to push the changes to the repo".magenta()
@@ -271,4 +298,16 @@ pub fn msg_handler(value: &str, in_handler: bool) -> Result<(), Error> {
         }
         disable_raw_mode()?;
     }
+}
+
+
+pub fn load_models_from_json() -> Vec<Model> {
+  let models_path = include_str!("../../assets/models.json");
+    match serde_json::from_str::<Models>(&models_path) {
+    Ok(model_obj) => model_obj.models,
+    Err(_e) => {
+        println!("{}", "couldn't load models".red());
+        return vec![];
+    }
+}
 }
