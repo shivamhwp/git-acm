@@ -1,3 +1,7 @@
+### 1.2.1
+
+    - o3 and o4-mini support
+
 ### 1.2.0
 
     - a huge refactor
