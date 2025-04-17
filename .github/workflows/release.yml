@@ -49,10 +49,23 @@ jobs:
             chmod +x "${{ matrix.platform.name }}"
           fi
 
+          # Generate checksum files
+          if [ "${{ matrix.platform.os }}" = "windows-latest" ]; then
+            certutil -hashfile "${{ matrix.platform.name }}" SHA256 | grep -v "^SHA256" | grep -v "^CertUtil" | tr -d " \t\r\n" > "${{ matrix.platform.name }}.sha256"
+          elif [ "${{ matrix.platform.os }}" = "macos-latest" ]; then
+            shasum -a 256 "${{ matrix.platform.name }}" | cut -d ' ' -f 1 > "${{ matrix.platform.name }}.sha256"
+          else
+            sha256sum "${{ matrix.platform.name }}" | cut -d ' ' -f 1 > "${{ matrix.platform.name }}.sha256"
+          fi
+
+          # Show generated checksum for verification in logs
+          echo "Generated checksum for ${{ matrix.platform.name }}:"
+          cat "${{ matrix.platform.name }}.sha256"
+
       - name: Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: ${{ matrix.platform.name }}
+          artifacts: ${{ matrix.platform.name }},${{ matrix.platform.name }}.sha256
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           artifactContentType: application/octet-stream # Ensure binary format is preserved
