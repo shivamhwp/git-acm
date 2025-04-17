@@ -26,7 +26,7 @@ VERSION=$(curl -s https://api.github.com/repos/shivamhwp/git-acm/releases/latest
 if [ "$PLATFORM" = "windows" ]; then
     BINARY="git-acm-windows-x86_64.exe"
 else
-    BINARY="git-acm-${PLATFORM}"
+    BINARY="git-acm-${PLATFORM}-${ARCH}"
 fi
 
 DOWNLOAD_URL="https://github.com/shivamhwp/git-acm/releases/download/${VERSION}/${BINARY}"
@@ -60,13 +60,13 @@ fi
 # progress "downloading trusted checksum"
 if curl -sL --fail "$CHECKSUM_URL" -o "$TMP_EXPECTED_CHECKSUM"; then
     # progress "successfully downloaded checksum file"
-    progress "making sure it's all good"
+      progress "making sure it's all good"
 else
     echo "warning: could not download checksum file, using fallback verification"
     # As fallback, download the binary a second time to verify it hasn't been corrupted
     SECOND_DOWNLOAD="${TMP_DIR}/second_${BINARY}"
     curl -sL "$DOWNLOAD_URL" -o "$SECOND_DOWNLOAD"
-    (cd "$TMP_DIR" && $SHA256_CMD "second_${BINARY}" > "$TMP_EXPECTED_CHECKSUM")
+    (cd "$TMP_DIR" && $SHA256_CMD "$BINARY" > "$TMP_EXPECTED_CHECKSUM")
     progress "performed secondary download for comparison"
 fi
 
@@ -77,8 +77,8 @@ EXPECTED_CHECKSUM=$(cat "$TMP_EXPECTED_CHECKSUM" | tr -d ' \r\n')
 
 if [ "$LOCAL_CHECKSUM" != "$EXPECTED_CHECKSUM" ]; then
     echo "error: checksum verification failed"
-    echo "expected: $EXPECTED_CHECKSUM"
-    echo "got:      $LOCAL_CHECKSUM"
+    # echo "expected: $EXPECTED_CHECKSUM"
+    # echo "got:      $LOCAL_CHECKSUM"
     rm -rf "$TMP_DIR"
     exit 1
 fi
