@@ -60,7 +60,7 @@ fi
 # progress "downloading trusted checksum"
 if curl -sL --fail "$CHECKSUM_URL" -o "$TMP_EXPECTED_CHECKSUM"; then
     # progress "successfully downloaded checksum file"
-      progress "making sure it's all good"
+      progress "making sure it's safe 🦺 and secure 🔒"
 else
     echo "warning: could not download checksum file, using fallback verification"
     # As fallback, download the binary a second time to verify it hasn't been corrupted
@@ -71,7 +71,7 @@ else
 fi
 
 # Verify integrity by comparing checksums
-progress "verifying if it's all safe and secure"
+# progress "verifying if it's all safe and secure"
 LOCAL_CHECKSUM=$(cut -d' ' -f1 "$TMP_CHECKSUM")
 EXPECTED_CHECKSUM=$(cat "$TMP_EXPECTED_CHECKSUM" | tr -d ' \r\n')
 
@@ -83,7 +83,6 @@ if [ "$LOCAL_CHECKSUM" != "$EXPECTED_CHECKSUM" ]; then
     exit 1
 fi
 
-progress "almost there"
 
 # Determine install location
 if [ "$PLATFORM" = "darwin" ]; then
@@ -123,4 +122,4 @@ fi
 # Cleanup
 rm -rf "$TMP_DIR"
 
-progress "all done 🎉  "
+progress "all done 🎉 !!!"

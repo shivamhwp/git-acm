@@ -10,7 +10,7 @@ docs 📄 : [git-acm.pages.dev](https://git-acm.pages.dev) | crate 🦀 : [crate
 ### installation
 
 ```
-curl -sSL https://raw.githubusercontent.com/shivamhwp/git-acm/main/install.sh | sh
+curl -sSL https://raw.githubusercontent.com/shivamhwp/git-acm/main/install.sh | bash
 ```
 
 > to update : just run the installation command, it checks the system for prev version and then installs a new version if there's one.
