@@ -29,7 +29,7 @@ fn main() {
 
     let cli = Command::new("git-acm")
         .author("shivam [shivam.ing]")
-        .version("1.2.2") 
+        .version("1.2.3") 
         .about(description)
         .subcommand(
             Command::new("use")
