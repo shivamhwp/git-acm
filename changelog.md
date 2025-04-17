@@ -1,3 +1,7 @@
+### 1.2.2
+
+    - gemini 2.5 flash support
+
 ### 1.2.1
 
     - o3 and o4-mini support
