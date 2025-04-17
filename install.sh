@@ -39,7 +39,7 @@ TMP_CHECKSUM="${TMP_DIR}/${BINARY}.sha256"
 TMP_EXPECTED_CHECKSUM="${TMP_DIR}/expected.sha256"
 
 # Download binary
-progress "downloading the main part"
+progress "downloading..."
 curl -sL "$DOWNLOAD_URL" -o "$TMP_FILE"
 
 # Determine which checksum tool to use
@@ -60,6 +60,7 @@ fi
 # progress "downloading trusted checksum"
 if curl -sL --fail "$CHECKSUM_URL" -o "$TMP_EXPECTED_CHECKSUM"; then
     # progress "successfully downloaded checksum file"
+    progress "making sure it's all good"
 else
     echo "warning: could not download checksum file, using fallback verification"
     # As fallback, download the binary a second time to verify it hasn't been corrupted
