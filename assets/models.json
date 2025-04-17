@@ -6,6 +6,11 @@
       "provider": "openai"
     },
     {
+      "model_api_name": "gemini-2.5-flash-preview-04-17",
+      "model_name": "gemini-2.5-flash",
+      "provider": "gemini"
+    },
+    {
       "model_api_name": "o4-mini-2025-04-16",
       "model_name": "o4-mini",
       "provider": "openai"
