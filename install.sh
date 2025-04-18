@@ -123,3 +123,30 @@ fi
 rm -rf "$TMP_DIR"
 
 progress "all done 🎉 !!!"
+
+# Attempt to refresh PATH in current shell
+SHELL_CONFIG_REFRESHED=false
+
+if [ -n "$ZSH_VERSION" ]; then
+  # User is likely using zsh
+  if [ -f "$HOME/.zshrc" ]; then
+    source "$HOME/.zshrc"
+    SHELL_CONFIG_REFRESHED=true
+  fi
+elif [ -n "$BASH_VERSION" ]; then
+  # User is likely using bash
+  if [ -f "$HOME/.bashrc" ]; then
+    source "$HOME/.bashrc"
+    SHELL_CONFIG_REFRESHED=true
+  elif [ -f "$HOME/.bash_profile" ]; then
+    source "$HOME/.bash_profile"
+    SHELL_CONFIG_REFRESHED=true
+  elif [ -f "$HOME/.profile" ]; then
+    source "$HOME/.profile"
+    SHELL_CONFIG_REFRESHED=true
+  fi
+fi
+
+if ! $SHELL_CONFIG_REFRESHED; then
+  progress "Please open a new terminal window or run 'source ~/.zshrc' or 'source ~/.bashrc' to refresh your PATH."
+fi
