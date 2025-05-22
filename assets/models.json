@@ -6,6 +6,11 @@
       "provider": "openai"
     },
     {
+      "model_api_name": "o3-2025-04-16",
+      "model_name": "o3",
+      "provider": "openai"
+    },
+    {
       "model_api_name": "gemini-2.5-flash-preview-04-17",
       "model_name": "gemini-2.5-flash",
       "provider": "gemini"
@@ -16,9 +21,14 @@
       "provider": "openai"
     },
     {
-      "model_api_name": "o3-2025-04-16",
-      "model_name": "o3",
-      "provider": "openai"
+      "model_api_name": "claude-sonnet-4-20250514",
+      "model_name": "claude-sonnet-4",
+      "provider": "anthropic"
+    },
+    {
+      "model_api_name": "claude-opus-4-20250514",
+      "model_name": "claude-opus-4",
+      "provider": "anthropic"
     },
     {
       "model_api_name": "o1-mini-2024-09-12",

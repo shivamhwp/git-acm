@@ -117,6 +117,9 @@ if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     if [ -f "$HOME/.bashrc" ]; then
         echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$HOME/.bashrc"
     fi
+    if [ -f "$HOME/.config/fish/config.fish" ]; then
+        echo "set -gx PATH $INSTALL_DIR \$PATH" >> "$HOME/.config/fish/config.fish"
+    fi
 fi
 
 # Cleanup
@@ -143,6 +146,12 @@ elif [ -n "$BASH_VERSION" ]; then
     SHELL_CONFIG_REFRESHED=true
   elif [ -f "$HOME/.profile" ]; then
     source "$HOME/.profile"
+    SHELL_CONFIG_REFRESHED=true
+  fi
+elif [ -n "$FISH_VERSION" ]; then
+  # User is likely using fish
+  if [ -f "$HOME/.config/fish/config.fish" ]; then
+    source "$HOME/.config/fish/config.fish"
     SHELL_CONFIG_REFRESHED=true
   fi
 fi
