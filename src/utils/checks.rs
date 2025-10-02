@@ -6,17 +6,7 @@ impl Check {
         if value.is_empty() {
             println!(
                 "{}",
-                "either export the key in terminal or define them in .env"
-            );
-            std::process::exit(1)
-        }
-    }
-
-    pub fn api_url_present(value: &str) {
-        if value.is_empty() {
-            println!(
-                "{}",
-                "either export the key in terminal or define them in .env"
+                "either export the key in terminal or define them in .env".red()
             );
             std::process::exit(1)
         }
@@ -31,22 +21,10 @@ impl Check {
 
     pub fn is_diff_empty(value: &str) {
         if value.is_empty() {
-            println!("{}", "🤔 are the stages changed ?".red());
-            println!("{}", "💡 try `git add <file_name>`".red());
-            std::process::exit(1)
-        }
-    }
-
-    // pub fn is_response_empty(value: &str) {
-    //     if value.is_empty() {
-    //         println!("{}", " no response, might be a server error".red());
-    //         std::process::exit(1)
-    //     }
-    // }
-
-    pub fn is_model_name_empty(value: &str) {
-        if value.is_empty() {
-            println!("{}", "model_name not found".red());
+            println!(
+                "{}",
+                "🤔 are the stages changed ? , try `git add <file_name>`".red()
+            );
             std::process::exit(1)
         }
     }
