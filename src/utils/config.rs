@@ -106,7 +106,7 @@ pub fn save_model_value(value: &str) {
 }
 
 pub fn save_auto_commit(enabled: bool) {
-    let status = if enabled { "enable" } else { "disable" };
+    let status = if enabled { "enabled" } else { "disabled" };
     match load_preferences() {
         Ok(mut prefs) => {
             prefs.auto_commit = enabled;
@@ -117,7 +117,7 @@ pub fn save_auto_commit(enabled: bool) {
                     format!("{}", e).red()
                 );
             } else {
-                println!("autocommit { }d", format!("{}", status).green());
+                println!("autocommit {}", format!("{}", status).green());
             }
         }
         Err(e) => {
@@ -209,20 +209,20 @@ pub fn print_to_cli(value: &str) {
         std::process::exit(1)
     } else {
         println!("{}", value.blue());
-        match msg_handler(value, false) {
-            Ok(_v) => {}
-            _ => {
-                println!("{}", "invalid input".red());
-                std::process::exit(1);
-            }
-        }
     }
 
     return;
 }
 
 // this fn takes a str as input and watches for the return or r key based on which wither it calls the commit getter again or accepts the result.
-pub fn msg_handler(value: &str, in_handler: bool) -> Result<(), io::Error> {
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum InputAction {
+    Accept,
+    Retry,
+    Quit,
+}
+
+pub async fn msg_handler(_value: &str, _in_handler: bool) -> Result<InputAction, io::Error> {
     println!(
         "{}",
         "[enter]: accept | [r]: get a new commit message | [q]: exit".magenta()
@@ -234,38 +234,20 @@ pub fn msg_handler(value: &str, in_handler: bool) -> Result<(), io::Error> {
                 match key.code {
                     KeyCode::Enter => {
                         disable_raw_mode()?;
-                        println!("{}", value);
-                        // the follwing fns are here. so that these only run once.
-                        copy_to_clipboard(value).unwrap_or_else(|_x| {
-                            println!("{}", "error copying the result to clipboard".yellow())
-                        });
-                        run_git_commit(value);
-                        return Ok(());
+                        return Ok(InputAction::Accept);
                     }
                     KeyCode::Char('r') => {
                         disable_raw_mode()?;
                         println!("{}", "Getting a new message...".green());
-                        if !in_handler {
-                            //  to prevent the infinite loop
-                            tokio::runtime::Runtime::new()
-                                .unwrap()
-                                .block_on(crate::generate_commit_message());
-                        }
-                        return Ok(());
+                        return Ok(InputAction::Retry);
                     }
                     KeyCode::Char('q') => {
                         disable_raw_mode()?;
-                        println!("{}", "exiting...".green());
-                        std::process::exit(0);
+                        return Ok(InputAction::Quit);
                     }
-                    _ => {
-                        disable_raw_mode()?;
-                        println!("{}", "invalid input".red());
-                        std::process::exit(1);
-                    }
+                    _ => {}
                 }
             }
         }
-        disable_raw_mode()?;
     }
 }

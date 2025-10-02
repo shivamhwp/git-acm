@@ -5,13 +5,13 @@ mod utils;
 
 use utils::{
     config::{
-        load_model_from_pref, load_models_list, print_to_cli, save_auto_commit, save_model_value,
+        copy_to_clipboard, load_model_from_pref, load_models_list, msg_handler, print_to_cli,
+        run_git_commit, save_auto_commit, save_model_value, InputAction,
     },
     diff::is_git_initialized,
     openrouter::{fetch_and_store_models, get_commit_message_from_openrouter},
 };
 
-const VERSION: &str = "1.3.0";
 const AUTHOR: &str = "shivam [shivam.ing]";
 
 #[tokio::main]
@@ -43,7 +43,7 @@ fn build_cli() -> Command {
 
     Command::new("git-acm")
         .author(AUTHOR)
-        .version(VERSION)
+        .version(env!("CARGO_PKG_VERSION"))
         .about(description)
         .subcommand(Command::new("list").about("Lists all supported models"))
         .subcommand(Command::new("get-models").about("Fetch and store models from OpenRouter"))
@@ -62,7 +62,7 @@ fn build_cli() -> Command {
 }
 
 fn list_models() {
-    println!("{}", " available models".green());
+    println!("{}", "Available models".green());
     // Prefer stored models if present
     match load_models_list() {
         Ok(models) => {
@@ -83,12 +83,42 @@ async fn handle_model_selection(sub_matches: &clap::ArgMatches) {
 
     // Try stored models first
     if let Ok(models) = utils::config::load_models_list() {
+        let target = model_name.to_lowercase();
+
         if let Some(found) = models.iter().find(|m| m.canonical_slug == *model_name) {
             save_model_value(&found.canonical_slug);
             generate_commit_message().await;
             return;
         }
+
+        if let Some(found) = models
+            .iter()
+            .find(|m| m.canonical_slug.to_lowercase() == target || m.name.to_lowercase() == target)
+        {
+            save_model_value(&found.canonical_slug);
+            generate_commit_message().await;
+            return;
+        }
+
+        let mut possible_matches: Vec<&utils::config::StoredModel> = models
+            .iter()
+            .filter(|m| m.canonical_slug.to_lowercase().contains(&target))
+            .collect();
+
+        if possible_matches.len() == 1 {
+            let found = possible_matches.remove(0);
+            save_model_value(&found.canonical_slug);
+            generate_commit_message().await;
+            return;
+        } else if !possible_matches.is_empty() {
+            eprintln!("{}", "Model not found. Did you mean:".yellow());
+            for m in possible_matches.into_iter().take(5) {
+                eprintln!("  - {} ({})", m.name, m.canonical_slug);
+            }
+            std::process::exit(1);
+        }
     }
+
     eprintln!("{}", format!("Model '{}' not found", model_name).red());
     eprintln!(
         "{}",
@@ -114,7 +144,32 @@ pub async fn generate_commit_message() {
 
     println!("{} {}", "Using model:".cyan(), chosen_model.magenta());
 
-    // Pass the canonical slug (provider/model) to OpenRouter
-    let commit_message = get_commit_message_from_openrouter(&chosen_model).await;
-    print_to_cli(&commit_message);
+    loop {
+        // Pass the canonical slug (provider/model) to OpenRouter
+        let commit_message = get_commit_message_from_openrouter(&chosen_model).await;
+        print_to_cli(&commit_message);
+
+        match msg_handler(&commit_message, false).await {
+            Ok(InputAction::Accept) => {
+                println!("{}", &commit_message);
+                copy_to_clipboard(&commit_message).unwrap_or_else(|_| {
+                    println!("{}", "error copying the result to clipboard".yellow())
+                });
+                run_git_commit(&commit_message);
+                break;
+            }
+            Ok(InputAction::Retry) => {
+                println!("{}", "Getting a new message...".green());
+                continue;
+            }
+            Ok(InputAction::Quit) => {
+                println!("{}", "exiting...".green());
+                std::process::exit(0);
+            }
+            Err(_) => {
+                println!("{}", "invalid input".red());
+                std::process::exit(1);
+            }
+        }
+    }
 }

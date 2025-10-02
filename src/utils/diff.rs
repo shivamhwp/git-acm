@@ -4,7 +4,7 @@ use yansi::Paint;
 use crate::utils::checks::Check;
 
 pub fn get_diff() -> String {
-    match cmd!("git", "diff", "--staged", "--color=always").read() {
+    match cmd!("git", "diff", "--staged", "--unified=0", "--no-color").read() {
         Ok(result) => {
             Check::is_diff_empty(&result);
             return result;
