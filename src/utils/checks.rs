@@ -6,7 +6,7 @@ impl Check {
         if value.is_empty() {
             println!(
                 "{}",
-                "either export the key in terminal or define them in .env".red()
+                "either export the OPENROUTER_API_KEY in terminal or define them in .env".red()
             );
             std::process::exit(1)
         }
@@ -23,7 +23,7 @@ impl Check {
         if value.is_empty() {
             println!(
                 "{}",
-                "🤔 are the stages changed ? , try `git add <file_name>`".red()
+                "are the stages changed ? try `git add <file_name>`".red()
             );
             std::process::exit(1)
         }

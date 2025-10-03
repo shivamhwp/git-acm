@@ -112,7 +112,7 @@ pub fn save_auto_commit(enabled: bool) {
             prefs.auto_commit = enabled;
             if let Err(e) = save_preferences(&prefs) {
                 println!(
-                    "Autocommit {} failed to save: {}",
+                    "autocommit {} failed to save: {}",
                     status,
                     format!("{}", e).red()
                 );
@@ -121,7 +121,7 @@ pub fn save_auto_commit(enabled: bool) {
             }
         }
         Err(e) => {
-            println!("Failed to save autocommit: {}", format!("{}", e).red());
+            println!("failed to save autocommit: {}", format!("{}", e).red());
         }
     }
 }
@@ -158,7 +158,7 @@ pub fn models_file_path() -> PathBuf {
 pub fn save_models_list(models: &[StoredModel]) -> Result<(), Box<dyn std::error::Error>> {
     // Ensure config dir exists
     if let Err(e) = config_exists() {
-        println!("{}", format!("Failed to create config dir: {}", e).red());
+        println!("{}", format!("failed to create config dir: {}", e).red());
         return Err(Box::new(e));
     }
     let path = models_file_path();
@@ -238,7 +238,6 @@ pub async fn msg_handler(_value: &str, _in_handler: bool) -> Result<InputAction,
                     }
                     KeyCode::Char('r') => {
                         disable_raw_mode()?;
-                        println!("{}", "Getting a new message...".green());
                         return Ok(InputAction::Retry);
                     }
                     KeyCode::Char('q') => {

@@ -46,7 +46,7 @@ fn build_cli() -> Command {
         .version(env!("CARGO_PKG_VERSION"))
         .about(description)
         .subcommand(Command::new("list").about("Lists all supported models"))
-        .subcommand(Command::new("get-models").about("Fetch and store models from OpenRouter"))
+        .subcommand(Command::new("get-models").about("fetch models from openrouter and store them (don't run it too much (you might get rate limited)"))
         .subcommand(
             Command::new("use")
                 .about("Choose which model to use (run 'git-acm list' to see available models)")
@@ -159,7 +159,7 @@ pub async fn generate_commit_message() {
                 break;
             }
             Ok(InputAction::Retry) => {
-                println!("{}", "Getting a new message...".green());
+                println!("{}", "getting a new message...".green());
                 continue;
             }
             Ok(InputAction::Quit) => {
