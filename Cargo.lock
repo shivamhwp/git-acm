@@ -1045,7 +1045,7 @@ checksum = "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7"
 
 [[package]]
 name = "git-acm"
-version = "1.3.0"
+version = "2.0.0"
 dependencies = [
  "arboard",
  "clap",

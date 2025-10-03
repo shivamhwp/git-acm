@@ -15,9 +15,16 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Preferences {
-    pub default_model: String,
-    pub user_selected_model: String,
+    pub default_model: StoredModel,
+    pub user_selected_model: StoredModel,
     pub auto_commit: bool,
+}
+
+pub fn default_model() -> StoredModel {
+    StoredModel {
+        name: "OpenAI: GPT-5 Codex".to_string(),
+        canonical_slug: "openai/gpt-5-codex".to_string(),
+    }
 }
 
 fn get_config_dir() -> PathBuf {
@@ -40,18 +47,20 @@ fn config_file_path() -> PathBuf {
 pub fn load_preferences() -> Result<Preferences, Box<dyn std::error::Error>> {
     if let Err(e) = config_exists() {
         println!("{}", format!("Failed to create config dir: {}", e).red());
+        let default_model = default_model();
         let default_prefs = Preferences {
-            default_model: "openai/gpt-5-chat".to_string(),
-            user_selected_model: "openai/gpt-5-chat".to_string(),
+            default_model: default_model.clone(),
+            user_selected_model: default_model,
             auto_commit: false,
         };
         return Ok(default_prefs);
     }
     let config_file = config_file_path();
     if !config_file.exists() {
+        let default_model = default_model();
         let default_prefs = Preferences {
-            default_model: "openai/gpt-5-chat".to_string(),
-            user_selected_model: "openai/gpt-5-chat".to_string(),
+            default_model: default_model.clone(),
+            user_selected_model: default_model,
             auto_commit: false,
         };
         save_preferences(&default_prefs)?;
@@ -71,10 +80,10 @@ pub fn save_preferences(prefs: &Preferences) -> Result<(), Box<dyn std::error::E
     Ok(())
 }
 
-pub fn load_model_from_pref(_provider: Option<&str>) -> String {
+pub fn load_model_from_pref(_provider: Option<&str>) -> StoredModel {
     match load_preferences() {
         Ok(prefs) => prefs.user_selected_model,
-        Err(_) => "openai/gpt-5-chat".to_string(),
+        Err(_) => default_model(),
     }
 }
 
@@ -85,20 +94,24 @@ pub fn load_auto_commit() -> bool {
     }
 }
 
-pub fn save_model_value(value: &str) {
+pub fn save_model_value(model: &StoredModel) {
     match load_preferences() {
         Ok(mut prefs) => {
-            prefs.user_selected_model = value.to_string();
+            prefs.user_selected_model = model.clone();
             if let Err(e) = save_preferences(&prefs) {
-                println!("{} {}", value, format!(" couldn't save: {}", e).red());
+                println!(
+                    "{} {}",
+                    model.canonical_slug,
+                    format!(" couldn't save: {}", e).red()
+                );
             } else {
-                println!("{} {}", value, " saved as default.".green());
+                println!("{} {}", model.canonical_slug, " saved as default.".green());
             }
         }
         Err(e) => {
             println!(
                 "{} {}",
-                value,
+                model.canonical_slug,
                 format!(" couldn't save, error: {}", e).red()
             );
         }

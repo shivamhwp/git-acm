@@ -86,7 +86,7 @@ async fn handle_model_selection(sub_matches: &clap::ArgMatches) {
         let target = model_name.to_lowercase();
 
         if let Some(found) = models.iter().find(|m| m.canonical_slug == *model_name) {
-            save_model_value(&found.canonical_slug);
+            save_model_value(found);
             generate_commit_message().await;
             return;
         }
@@ -95,7 +95,7 @@ async fn handle_model_selection(sub_matches: &clap::ArgMatches) {
             .iter()
             .find(|m| m.canonical_slug.to_lowercase() == target || m.name.to_lowercase() == target)
         {
-            save_model_value(&found.canonical_slug);
+            save_model_value(found);
             generate_commit_message().await;
             return;
         }
@@ -107,7 +107,7 @@ async fn handle_model_selection(sub_matches: &clap::ArgMatches) {
 
         if possible_matches.len() == 1 {
             let found = possible_matches.remove(0);
-            save_model_value(&found.canonical_slug);
+            save_model_value(found);
             generate_commit_message().await;
             return;
         } else if !possible_matches.is_empty() {
@@ -142,11 +142,16 @@ fn handle_autocommit(sub_matches: &clap::ArgMatches) {
 pub async fn generate_commit_message() {
     let chosen_model = load_model_from_pref(None);
 
-    println!("{} {}", "Using model:".cyan(), chosen_model.magenta());
+    println!(
+        "{} {}",
+        "Using model:".cyan(),
+        chosen_model.name.magenta()
+    );
 
     loop {
         // Pass the canonical slug (provider/model) to OpenRouter
-        let commit_message = get_commit_message_from_openrouter(&chosen_model).await;
+        let commit_message =
+            get_commit_message_from_openrouter(&chosen_model.canonical_slug).await;
         print_to_cli(&commit_message);
 
         match msg_handler(&commit_message, false).await {
