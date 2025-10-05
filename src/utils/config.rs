@@ -7,11 +7,19 @@ use duct::cmd;
 use std::{
     env, fs,
     io::{self, BufReader, BufWriter},
-    path::{Path, PathBuf},
+    path::{PathBuf},
 };
 use yansi::Paint;
 
 use serde::{Deserialize, Serialize};
+
+// Centralized default model
+fn default_model() -> StoredModel {
+    StoredModel {
+        name: "Google: Gemini 2.5 Flash Preview 09-2025".to_string(),
+        canonical_slug: "google/gemini-2.5-flash-preview-09-2025".to_string(),
+    }
+}
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Preferences {
@@ -20,16 +28,11 @@ pub struct Preferences {
     pub auto_commit: bool,
 }
 
-pub fn default_model() -> StoredModel {
-    StoredModel {
-        name: "OpenAI: GPT-5 Codex".to_string(),
-        canonical_slug: "openai/gpt-5-codex".to_string(),
-    }
-}
-
 fn get_config_dir() -> PathBuf {
-    let home = env::var("HOME").unwrap_or_else(|_| ".".to_string());
-    return Path::new(&home).join(".config").join("git-acm");
+    directories::ProjectDirs::from("", "", "git-acm")
+        .expect("Configuration directory not available on this platform")
+        .config_dir()
+        .to_path_buf()
 }
 
 fn config_exists() -> Result<(), io::Error> {
@@ -80,7 +83,7 @@ pub fn save_preferences(prefs: &Preferences) -> Result<(), Box<dyn std::error::E
     Ok(())
 }
 
-pub fn load_model_from_pref(_provider: Option<&str>) -> StoredModel {
+pub fn load_model_from_pref() -> StoredModel {
     match load_preferences() {
         Ok(prefs) => prefs.user_selected_model,
         Err(_) => default_model(),
@@ -94,48 +97,36 @@ pub fn load_auto_commit() -> bool {
     }
 }
 
+fn try_update_preferences<F>(update: F) -> Result<(), Box<dyn std::error::Error>>
+where
+    F: FnOnce(&mut Preferences),
+{
+    let mut prefs = load_preferences()?;
+    update(&mut prefs);
+    save_preferences(&prefs)?;
+    Ok(())
+}
+
 pub fn save_model_value(model: &StoredModel) {
-    match load_preferences() {
-        Ok(mut prefs) => {
-            prefs.user_selected_model = model.clone();
-            if let Err(e) = save_preferences(&prefs) {
-                println!(
-                    "{} {}",
-                    model.canonical_slug,
-                    format!(" couldn't save: {}", e).red()
-                );
-            } else {
-                println!("{} {}", model.canonical_slug, " saved as default.".green());
-            }
-        }
-        Err(e) => {
-            println!(
-                "{} {}",
-                model.canonical_slug,
-                format!(" couldn't save, error: {}", e).red()
-            );
-        }
+    match try_update_preferences(|prefs| prefs.user_selected_model = model.clone()) {
+        Ok(()) => println!("{} {}", model.canonical_slug, " saved as default.".green()),
+        Err(e) => println!(
+            "{} {}",
+            model.canonical_slug,
+            format!(" couldn't save: {}", e).red()
+        ),
     }
 }
 
 pub fn save_auto_commit(enabled: bool) {
     let status = if enabled { "enabled" } else { "disabled" };
-    match load_preferences() {
-        Ok(mut prefs) => {
-            prefs.auto_commit = enabled;
-            if let Err(e) = save_preferences(&prefs) {
-                println!(
-                    "autocommit {} failed to save: {}",
-                    status,
-                    format!("{}", e).red()
-                );
-            } else {
-                println!("autocommit {}", format!("{}", status).green());
-            }
-        }
-        Err(e) => {
-            println!("failed to save autocommit: {}", format!("{}", e).red());
-        }
+    match try_update_preferences(|prefs| prefs.auto_commit = enabled) {
+        Ok(()) => println!("autocommit {}", format!("{}", status).green()),
+        Err(e) => println!(
+            "autocommit {} failed to save: {}",
+            status,
+            format!("{}", e).red()
+        ),
     }
 }
 
@@ -147,14 +138,9 @@ pub fn get_api_key() -> String {
 }
 
 pub fn copy_to_clipboard(text: &str) -> Result<(), Box<dyn std::error::Error>> {
-    match Clipboard::new()?.set_text(text) {
-        Ok(_t) => {
-            println!("{}", "copied to clipboard 👍".magenta());
-        }
-        Err(_e) => {
-            println!("{}", "( couldn't copy to clipboard 🥲 )".yellow());
-        }
-    }
+    let mut clipboard = Clipboard::new()?;
+    clipboard.set_text(text)?;
+    println!("{}", "copied to clipboard 👍".magenta());
     Ok(())
 }
 
@@ -235,26 +221,32 @@ pub enum InputAction {
     Quit,
 }
 
-pub async fn msg_handler(_value: &str, _in_handler: bool) -> Result<InputAction, io::Error> {
+struct RawModeGuard;
+
+impl Drop for RawModeGuard {
+    fn drop(&mut self) {
+        let _ = disable_raw_mode();
+    }
+}
+
+pub async fn msg_handler() -> Result<InputAction, io::Error> {
     println!(
         "{}",
         "[enter]: accept | [r]: get a new commit message | [q]: exit".magenta()
     );
     enable_raw_mode()?;
+    let _guard = RawModeGuard;
     loop {
         if let Event::Key(key) = event::read()? {
             if key.kind == KeyEventKind::Press {
                 match key.code {
                     KeyCode::Enter => {
-                        disable_raw_mode()?;
                         return Ok(InputAction::Accept);
                     }
                     KeyCode::Char('r') => {
-                        disable_raw_mode()?;
                         return Ok(InputAction::Retry);
                     }
                     KeyCode::Char('q') => {
-                        disable_raw_mode()?;
                         return Ok(InputAction::Quit);
                     }
                     _ => {}

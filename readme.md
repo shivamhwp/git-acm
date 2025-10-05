@@ -2,9 +2,7 @@
 
 **Instant commit messages in the terminal** powered by [OpenRouter](https://openrouter.ai/)
 
-[![Docs](https://img.shields.io/badge/docs-git--acm.pages.dev-blue?logo=readthedocs)](https://git-acm.pages.dev) [![Crates.io](https://img.shields.io/badge/crates.io-git--acm-orange?logo=rust)](https://crates.io/crates/git-acm)
-
-![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm?labelColor=%23222&color=white)
+[![Docs](https://img.shields.io/badge/docs-git--acm.pages.dev-blue?logo=readthedocs)](https://git-acm.pages.dev) [![Crates.io](https://img.shields.io/badge/crates.io-git--acm-orange?logo=rust)](https://crates.io/crates/git-acm) ![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm?labelColor=%23222&color=white)
 
 ### Features
 - Generates concise, meaningful commit messages from staged changes.
@@ -12,7 +10,6 @@
 - Copies message to clipboard.
 - Auto-commit option.
 - Excludes common build dirs from diff (node_modules, target, etc.).
-
 
 ### installation
 
@@ -84,3 +81,9 @@ git-acm autocommit disable                # Disable auto-commit
 bhai(s) : [sargam](https://x.com/sargampoudel) (idea) and [smr](https://x.com/smrdotgg) (suggestions).
 
 <br>
+
+> **config storage** <br/>
+>`git-acm-prefs.json` (model + autocommit prefs.) and `models.json` (list of models available) are stored in your OS config directory.  
+> - **macOS:** `~/Library/Application Support/git-acm`  
+> - **Linux:** `$XDG_CONFIG_HOME/git-acm`  
+> - **Windows:** `%APPDATA%/git-acm`

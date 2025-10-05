@@ -21,6 +21,7 @@ arboard = "3.4.1"
 crossterm = "0.28.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+directories = "6.0.0"
 
 [profile.release]
 codegen-units = 1

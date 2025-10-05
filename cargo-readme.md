@@ -2,8 +2,9 @@
 
 ### instant meaningful commit messages powered by OpenRouter
 
+[![Docs](https://img.shields.io/badge/docs-git--acm.pages.dev-blue?logo=readthedocs)](https://git-acm.pages.dev) [![Crates.io](https://img.shields.io/badge/crates.io-git--acm-orange?logo=rust)](https://crates.io/crates/git-acm)
+
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm?labelColor=%23222&color=white)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/shivamhwp/git-acm/release.yml?labelColor=%23222&color=white)
 
 ### installation
 
@@ -29,6 +30,7 @@ curl -sSL https://raw.githubusercontent.com/shivamhwp/git-acm/main/install.sh | 
 `list` : List models.
 `autocommit enable/disable` : Toggle auto-commit.
 
+
 ### 📍 example
 
 ```bash
@@ -38,3 +40,9 @@ git-acm use anthropic/claude-sonnet-4.5
 git-acm autocommit enable
 git-acm
 ```
+<br/>
+> **config storage** <br/>
+>`git-acm-prefs.json` (model + autocommit prefs.) and `models.json` (list of models available) are stored in your OS config directory.  
+> - **macOS:** `~/Library/Application Support/git-acm`  
+> - **Linux:** `$XDG_CONFIG_HOME/git-acm`  
+> - **Windows:** `%APPDATA%/git-acm`

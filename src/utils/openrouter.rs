@@ -8,30 +8,24 @@ use openrouter_rs::api::models;
 // Removed custom response structs in favor of openrouter_rs models API
 use crate::utils::diff::get_diff;
 
-pub async fn get_commit_message_from_openrouter(model: &str) -> String {
-    // Load environment variables
-    dotenvy::dotenv().ok();
-
-    let full_diff = get_diff();
-
+pub fn build_openrouter_client() -> Result<OpenRouterClient, Box<dyn std::error::Error>> {
     let api_key = get_api_key();
     Check::api_key_present(&api_key);
+    match OpenRouterClient::builder().api_key(&api_key).build() {
+        Ok(client) => Ok(client),
+        Err(e) => Err(format!("Failed to create OpenRouter client: {}", e).into()),
+    }
+}
+
+pub async fn get_commit_message_from_openrouter(
+    client: &OpenRouterClient,
+    model: &str,
+) -> String {
+    let full_diff = get_diff();
 
     let prompt = include_str!("../../assets/prompt.txt");
 
     Check::is_prompt_empty(prompt);
-
-    // Build OpenRouter client
-    let client = match OpenRouterClient::builder().api_key(&api_key).build() {
-        Ok(client) => client,
-        Err(e) => {
-            println!(
-                "{}",
-                format!("Failed to create OpenRouter client: {}", e).red()
-            );
-            return String::new();
-        }
-    };
 
     let user_prompt = format!(
         "here's the git diff from which you have to generate a git-commit-message {}",
@@ -72,9 +66,6 @@ pub async fn get_commit_message_from_openrouter(model: &str) -> String {
 }
 
 pub async fn fetch_and_store_models() -> Result<(), Box<dyn std::error::Error>> {
-    // Load environment variables
-    dotenvy::dotenv().ok();
-
     let api_key = get_api_key();
     Check::api_key_present(&api_key);
 
@@ -92,7 +83,7 @@ pub async fn fetch_and_store_models() -> Result<(), Box<dyn std::error::Error>> 
         })
         .collect();
 
-    models.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    models.sort_by_key(|m| m.name.to_lowercase());
 
     save_models_list(&models)?;
     println!("{} {}", "fetched models:".green(), models.len());

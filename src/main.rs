@@ -9,13 +9,14 @@ use utils::{
         run_git_commit, save_auto_commit, save_model_value, InputAction,
     },
     diff::is_git_initialized,
-    openrouter::{fetch_and_store_models, get_commit_message_from_openrouter},
+    openrouter::{build_openrouter_client, fetch_and_store_models, get_commit_message_from_openrouter},
 };
 
 const AUTHOR: &str = "shivam [shivam.ing]";
 
 #[tokio::main]
 async fn main() {
+    dotenvy::dotenv().ok();
     is_git_initialized();
 
     let cli = build_cli().get_matches();
@@ -85,25 +86,20 @@ async fn handle_model_selection(sub_matches: &clap::ArgMatches) {
     if let Ok(models) = utils::config::load_models_list() {
         let target = model_name.to_lowercase();
 
-        if let Some(found) = models.iter().find(|m| m.canonical_slug == *model_name) {
-            save_model_value(found);
-            generate_commit_message().await;
-            return;
-        }
-
-        if let Some(found) = models
+        let exact = models.iter().find(|m| m.canonical_slug == *model_name);
+        let case_insensitive = models
             .iter()
-            .find(|m| m.canonical_slug.to_lowercase() == target || m.name.to_lowercase() == target)
-        {
-            save_model_value(found);
-            generate_commit_message().await;
-            return;
-        }
-
+            .find(|m| m.canonical_slug.to_lowercase() == target || m.name.to_lowercase() == target);
         let mut possible_matches: Vec<&utils::config::StoredModel> = models
             .iter()
-            .filter(|m| m.canonical_slug.to_lowercase().contains(&target))
+            .filter(|m| m.canonical_slug.to_lowercase().contains(&target) || m.name.to_lowercase().contains(&target))
             .collect();
+
+        if let Some(found) = exact.or(case_insensitive) {
+            save_model_value(found);
+            generate_commit_message().await;
+            return;
+        }
 
         if possible_matches.len() == 1 {
             let found = possible_matches.remove(0);
@@ -140,7 +136,14 @@ fn handle_autocommit(sub_matches: &clap::ArgMatches) {
 }
 
 pub async fn generate_commit_message() {
-    let chosen_model = load_model_from_pref(None);
+    let chosen_model = load_model_from_pref();
+    let client = match build_openrouter_client() {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("{}", format!("{}", e).red());
+            std::process::exit(1);
+        }
+    };
 
     println!(
         "{} {}",
@@ -151,12 +154,11 @@ pub async fn generate_commit_message() {
     loop {
         // Pass the canonical slug (provider/model) to OpenRouter
         let commit_message =
-            get_commit_message_from_openrouter(&chosen_model.canonical_slug).await;
+            get_commit_message_from_openrouter(&client, &chosen_model.canonical_slug).await;
         print_to_cli(&commit_message);
 
-        match msg_handler(&commit_message, false).await {
+        match msg_handler().await {
             Ok(InputAction::Accept) => {
-                println!("{}", &commit_message);
                 copy_to_clipboard(&commit_message).unwrap_or_else(|_| {
                     println!("{}", "error copying the result to clipboard".yellow())
                 });
