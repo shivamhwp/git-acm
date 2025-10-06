@@ -1,18 +1,19 @@
-name: Release
+name: build-matrix
 
 on:
   push:
-    tags:
-      - "v*"
+    branches: [ main, revamp ]
+  pull_request:
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   id-token: write
 
 env:
-  SBOM: "false"
-  ENABLE_UPX: "false"
-  MACOS_SIGN: "false"
+  SBOM: "false"            # set to "true" to generate SBOM
+  ENABLE_UPX: "false"      # set to "true" to compress binaries with upx on Linux
+  MACOS_SIGN: "false"      # set to "true" to enable macOS codesign + notarization
 
 jobs:
   build:
@@ -33,16 +34,13 @@ jobs:
           - name: macos-arm64
             runner: macos-14
             target: aarch64-apple-darwin
-          - name: windows-x86_64
-            runner: windows-latest
-            target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.platform.runner }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Rust
+      - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.platform.target }}
@@ -50,11 +48,16 @@ jobs:
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
-      - name: Build
-        run: cargo build --locked --release --target ${{ matrix.platform.target }}
+      - name: Show versions
+        run: |
+          rustc -Vv
+          cargo -V
 
-      - name: Strip binary (Linux/macOS)
-        if: ${{ runner.os != 'Windows' }}
+      - name: Build (release)
+        run: |
+          cargo build --locked --release --target ${{ matrix.platform.target }}
+
+      - name: Strip binary
         shell: bash
         run: |
           set -euo pipefail
@@ -62,6 +65,12 @@ jobs:
           if [ -f "$BIN" ]; then
             strip "$BIN" || true
           fi
+
+      - name: Compress binary with upx (optional, Linux only)
+        if: ${{ runner.os == 'Linux' && env.ENABLE_UPX == 'true' }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y upx
+          upx --lzma --best target/${{ matrix.platform.target }}/release/git-acm || true
 
       - name: Import Apple code-signing certs (macOS only)
         if: ${{ runner.os == 'macOS' && env.MACOS_SIGN == 'true' }}
@@ -91,63 +100,69 @@ jobs:
         with:
           name: ${{ matrix.platform.target }}
           path: |
-            target/${{ matrix.platform.target }}/release/git-acm*
+            target/${{ matrix.platform.target }}/release/git-acm
 
   package:
-    name: Package, checksum, sign, and release
+    name: Package archives and checksums
     needs: [build]
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download artifacts
+      - name: Download built artifacts
         uses: actions/download-artifact@v4
         with:
           path: dist/raw
 
-      - name: Prepare archives
+      - name: Prepare archive structure
         run: |
           set -euo pipefail
-          sudo apt-get update && sudo apt-get install -y zip
           mkdir -p dist/out
+          # Map artifact names to friendly platform names
           for dir in dist/raw/*; do
             name=$(basename "$dir")
+            bin="$dir/git-acm"
             case "$name" in
               x86_64-unknown-linux-gnu)
-                plat="linux-x86_64"; bin="$dir/git-acm"; kind="tar" ;;
+                plat="linux-x86_64" ;;
               aarch64-unknown-linux-gnu)
-                plat="linux-aarch64"; bin="$dir/git-acm"; kind="tar" ;;
+                plat="linux-aarch64" ;;
               x86_64-apple-darwin)
-                plat="darwin-x86_64"; bin="$dir/git-acm"; kind="tar" ;;
+                plat="darwin-x86_64" ;;
               aarch64-apple-darwin)
-                plat="darwin-arm64"; bin="$dir/git-acm"; kind="tar" ;;
-              x86_64-pc-windows-msvc)
-                plat="windows-x86_64"; bin="$dir/git-acm.exe"; kind="zip" ;;
-              *) echo "Skipping unknown artifact: $name" >&2; continue ;;
+                plat="darwin-arm64" ;;
+              *)
+                echo "Skipping unknown artifact: $name" >&2
+                continue ;;
             esac
             pkgdir="dist/package/git-acm-$plat"
             mkdir -p "$pkgdir"
-            install -m 0755 "$bin" "$pkgdir/$(basename "$bin")"
+            install -m 0755 "$bin" "$pkgdir/git-acm"
             cp -v LICENSE "$pkgdir/" || true
             cp -v readme.md "$pkgdir/README.md" || true
-            if [ "$kind" = "tar" ]; then
-              tar -C dist/package -czf "dist/out/git-acm-$plat.tar.gz" "git-acm-$plat"
-            else
-              (cd dist/package && zip -r "../out/git-acm-$plat.zip" "git-acm-$plat")
-            fi
+            tar -C dist/package -czf "dist/out/git-acm-$plat.tar.gz" "git-acm-$plat"
           done
 
       - name: Generate aggregated checksums
         run: |
           set -euo pipefail
           cd dist/out
+          # Prefer sha256sum; fallback to shasum -a 256
           if command -v sha256sum >/dev/null 2>&1; then
-            sha256sum *.tar.gz *.zip > checksums.txt
+            sha256sum *.tar.gz > checksums.txt
           else
-            shasum -a 256 *.tar.gz *.zip > checksums.txt
+            shasum -a 256 *.tar.gz > checksums.txt
           fi
           cat checksums.txt
+
+      - name: Upload packaged artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: git-acm-archives
+          path: |
+            dist/out/*.tar.gz
+            dist/out/checksums.txt
 
       - name: Install cosign
         uses: sigstore/cosign-installer@v3.6.0
@@ -158,14 +173,32 @@ jobs:
         run: |
           set -euo pipefail
           cd dist/out
-          for f in *.tar.gz *.zip checksums.txt; do
+          for f in *.tar.gz checksums.txt; do
             echo "Signing $f"
             cosign sign-blob --yes --output-signature "$f.sig" --output-certificate "$f.cert" "$f"
           done
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: Upload signatures
+        uses: actions/upload-artifact@v4
         with:
-          files: |
-            dist/out/*
-          generate_release_notes: true
+          name: git-acm-archives-signatures
+          path: |
+            dist/out/*.sig
+            dist/out/*.cert
+
+      - name: Generate SBOM (optional)
+        if: ${{ env.SBOM == 'true' }}
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Upload SBOM (optional)
+        if: ${{ env.SBOM == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: git-acm-sbom
+          path: sbom.spdx.json
+
+
