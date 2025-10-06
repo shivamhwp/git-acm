@@ -21,6 +21,7 @@ curl -sSL https://raw.githubusercontent.com/shivamhwp/git-acm/main/install.sh | 
 3. Run `git-acm get-models` to fetch models (run once, stores locally). Use `git-acm list` to view.
 4. Visit [openrouter.ai/models](https://openrouter.ai/models), copy model ID.
 5. Run `git-acm use <copied_model_id>` to select (e.g., `anthropic/claude-sonnet-4.5`).
+![Model selection screenshot](https://ypazyw0thq.ufs.sh/f/38t7p527clgq7em4D2IYty0zsu2PpBGJxga1efWZASI7i4DU)
 6. Stage changes: `git add .`
 7. Run `git-acm` to generate and use the commit message (copies to clipboard automatically).
 
@@ -41,6 +42,7 @@ git-acm autocommit enable
 git-acm
 ```
 <br/>
+
 > **config storage** <br/>
 >`git-acm-prefs.json` (model + autocommit prefs.) and `models.json` (list of models available) are stored in your OS config directory.  
 > - **macOS:** `~/Library/Application Support/git-acm`  

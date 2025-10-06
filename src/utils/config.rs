@@ -16,8 +16,8 @@ use serde::{Deserialize, Serialize};
 // Centralized default model
 fn default_model() -> StoredModel {
     StoredModel {
-        name: "Google: Gemini 2.5 Flash Preview 09-2025".to_string(),
-        canonical_slug: "google/gemini-2.5-flash-preview-09-2025".to_string(),
+        name: "xAI: Grok 4 Fast".to_string(),
+        canonical_slug: "x-ai/grok-4-fast".to_string(),
     }
 }
 
@@ -109,7 +109,7 @@ where
 
 pub fn save_model_value(model: &StoredModel) {
     match try_update_preferences(|prefs| prefs.user_selected_model = model.clone()) {
-        Ok(()) => println!("{} {}", model.canonical_slug, " saved as default.".green()),
+        Ok(()) => println!("{} {}", model.canonical_slug, " saved as default (will be used in future runs).".green()),
         Err(e) => println!(
             "{} {}",
             model.canonical_slug,

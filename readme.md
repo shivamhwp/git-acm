@@ -4,13 +4,6 @@
 
 [![Docs](https://img.shields.io/badge/docs-git--acm.pages.dev-blue?logo=readthedocs)](https://git-acm.pages.dev) [![Crates.io](https://img.shields.io/badge/crates.io-git--acm-orange?logo=rust)](https://crates.io/crates/git-acm) ![Crates.io Total Downloads](https://img.shields.io/crates/d/git-acm?labelColor=%23222&color=white)
 
-### Features
-- Generates concise, meaningful commit messages from staged changes.
-- Access to mostly all models through [OpenRouter](https://openrouter.ai/).
-- Copies message to clipboard.
-- Auto-commit option.
-- Excludes common build dirs from diff (node_modules, target, etc.).
-
 ### installation
 
 ```

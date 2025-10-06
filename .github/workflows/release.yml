@@ -10,9 +10,8 @@ permissions:
   id-token: write
 
 env:
-  SBOM: "false"
-  ENABLE_UPX: "false"
-  MACOS_SIGN: "false"
+  SBOM: "true"
+  MACOS_SIGN: "true"
 
 jobs:
   build:

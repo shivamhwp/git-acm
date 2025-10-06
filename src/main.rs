@@ -37,7 +37,7 @@ async fn main() {
 }
 
 fn build_cli() -> Command {
-    let description = " instant meaningful commit messages.\n (more): https://git.new/git-acm "
+    let description = " instant meaningful commit messages.\n (more): https://github.com/shivamhwp/git-acm "
         .magenta()
         .bold()
         .to_string();

@@ -2,8 +2,9 @@ name: build-matrix
 
 on:
   push:
-    branches: [ main, revamp ]
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -11,9 +12,8 @@ permissions:
   id-token: write
 
 env:
-  SBOM: "false"            # set to "true" to generate SBOM
-  ENABLE_UPX: "false"      # set to "true" to compress binaries with upx on Linux
-  MACOS_SIGN: "false"      # set to "true" to enable macOS codesign + notarization
+  SBOM: "true"             # generate SBOM
+  MACOS_SIGN: "true"       # enable macOS codesign + notarization
 
 jobs:
   build:
@@ -25,15 +25,23 @@ jobs:
           - name: linux-x86_64
             runner: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
+            ext: ""
           - name: linux-aarch64
             runner: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
+            ext: ""
           - name: macos-x86_64
             runner: macos-13
             target: x86_64-apple-darwin
+            ext: ""
           - name: macos-arm64
             runner: macos-14
             target: aarch64-apple-darwin
+            ext: ""
+          - name: windows-x86_64
+            runner: windows-latest
+            target: x86_64-pc-windows-msvc
+            ext: ".exe"
     runs-on: ${{ matrix.platform.runner }}
 
     steps:
@@ -58,19 +66,16 @@ jobs:
           cargo build --locked --release --target ${{ matrix.platform.target }}
 
       - name: Strip binary
+        if: ${{ runner.os != 'Windows' }}
         shell: bash
         run: |
           set -euo pipefail
-          BIN=target/${{ matrix.platform.target }}/release/git-acm
+          BIN=target/${{ matrix.platform.target }}/release/git-acm${{ matrix.platform.ext }}
           if [ -f "$BIN" ]; then
             strip "$BIN" || true
           fi
 
-      - name: Compress binary with upx (optional, Linux only)
-        if: ${{ runner.os == 'Linux' && env.ENABLE_UPX == 'true' }}
-        run: |
-          sudo apt-get update && sudo apt-get install -y upx
-          upx --lzma --best target/${{ matrix.platform.target }}/release/git-acm || true
+      # Removed UPX compression step per configuration
 
       - name: Import Apple code-signing certs (macOS only)
         if: ${{ runner.os == 'macOS' && env.MACOS_SIGN == 'true' }}
@@ -100,7 +105,7 @@ jobs:
         with:
           name: ${{ matrix.platform.target }}
           path: |
-            target/${{ matrix.platform.target }}/release/git-acm
+            target/${{ matrix.platform.target }}/release/git-acm${{ matrix.platform.ext }}
 
   package:
     name: Package archives and checksums
@@ -115,6 +120,9 @@ jobs:
         with:
           path: dist/raw
 
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip
+
       - name: Prepare archive structure
         run: |
           set -euo pipefail
@@ -122,6 +130,20 @@ jobs:
           # Map artifact names to friendly platform names
           for dir in dist/raw/*; do
             name=$(basename "$dir")
+            # Windows packaging (.zip)
+            if [ -f "$dir/git-acm.exe" ]; then
+              bin="$dir/git-acm.exe"
+              plat="windows-x86_64"
+              pkgdir="dist/package/git-acm-$plat"
+              mkdir -p "$pkgdir"
+              install -m 0755 "$bin" "$pkgdir/git-acm.exe"
+              cp -v LICENSE "$pkgdir/" || true
+              cp -v readme.md "$pkgdir/README.md" || true
+              (cd dist/package && zip -r "../out/git-acm-$plat.zip" "git-acm-$plat")
+              continue
+            fi
+
+            # Unix packaging (.tar.gz)
             bin="$dir/git-acm"
             case "$name" in
               x86_64-unknown-linux-gnu)
@@ -149,10 +171,12 @@ jobs:
           set -euo pipefail
           cd dist/out
           # Prefer sha256sum; fallback to shasum -a 256
+          files="*.tar.gz"
+          if ls *.zip >/dev/null 2>&1; then files="$files *.zip"; fi
           if command -v sha256sum >/dev/null 2>&1; then
-            sha256sum *.tar.gz > checksums.txt
+            eval "sha256sum $files > checksums.txt"
           else
-            shasum -a 256 *.tar.gz > checksums.txt
+            eval "shasum -a 256 $files > checksums.txt"
           fi
           cat checksums.txt
 
@@ -162,6 +186,7 @@ jobs:
           name: git-acm-archives
           path: |
             dist/out/*.tar.gz
+            dist/out/*.zip
             dist/out/checksums.txt
 
       - name: Install cosign
@@ -173,7 +198,8 @@ jobs:
         run: |
           set -euo pipefail
           cd dist/out
-          for f in *.tar.gz checksums.txt; do
+          shopt -s nullglob
+          for f in *.tar.gz *.zip checksums.txt; do
             echo "Signing $f"
             cosign sign-blob --yes --output-signature "$f.sig" --output-certificate "$f.cert" "$f"
           done
