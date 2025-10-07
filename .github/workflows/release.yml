@@ -11,7 +11,6 @@ permissions:
 
 env:
   SBOM: "true"
-  MACOS_SIGN: "true"
 
 jobs:
   build:
@@ -62,28 +61,7 @@ jobs:
             strip "$BIN" || true
           fi
 
-      - name: Import Apple code-signing certs (macOS only)
-        if: ${{ runner.os == 'macOS' && env.MACOS_SIGN == 'true' }}
-        uses: apple-actions/import-codesign-certs@v2
-        with:
-          p12-file-base64: ${{ secrets.MACOS_CERT_P12 }}
-          p12-password: ${{ secrets.MACOS_CERT_PASSWORD }}
 
-      - name: Codesign + Notarize (macOS only)
-        if: ${{ runner.os == 'macOS' && env.MACOS_SIGN == 'true' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          BIN=target/${{ matrix.platform.target }}/release/git-acm
-          codesign --force --options runtime --timestamp --sign "$MACOS_IDENTITY" "$BIN"
-          zip -j git-acm.zip "$BIN"
-          xcrun notarytool submit git-acm.zip \
-            --apple-id "${{ secrets.MACOS_NOTARY_APPLE_ID }}" \
-            --team-id "${{ secrets.MACOS_NOTARY_TEAM_ID }}" \
-            --password "${{ secrets.MACOS_NOTARY_PASSWORD }}" \
-            --wait
-          xcrun stapler staple "$BIN"
-          rm -f git-acm.zip
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
