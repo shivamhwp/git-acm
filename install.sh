@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
-set -euo pipefail
+set -eu
 
 progress() {
     echo "=> $1"
@@ -110,7 +110,9 @@ fi
 
 progress "verifying checksum..."
 LOCAL_CHECKSUM=$($SHA256_CMD "$TMP_ASSET" | awk '{print $1}' | tr -d ' \r\n')
-if [ "${LOCAL_CHECKSUM,,}" != "${EXPECTED_CHECKSUM,,}" ]; then
+LC_LOCAL=$(printf '%s' "$LOCAL_CHECKSUM" | tr '[:upper:]' '[:lower:]')
+LC_EXPECTED=$(printf '%s' "$EXPECTED_CHECKSUM" | tr '[:upper:]' '[:lower:]')
+if [ "$LC_LOCAL" != "$LC_EXPECTED" ]; then
     echo "error: checksum verification failed for $ASSET"
     echo "expected: $EXPECTED_CHECKSUM"
     echo "actual:   $LOCAL_CHECKSUM"
@@ -159,7 +161,13 @@ SHELL_NAME=$(basename "${SHELL:-}")
 PROFILE_FILE=""
 ADD_LINE=""
 
-if [ "$SKIP_PATH_EDITS" -eq 0 ] && [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
+# Detect whether INSTALL_DIR is already on PATH (POSIX-safe)
+PATH_HAS_INSTALL=0
+case ":$PATH:" in
+    *":$INSTALL_DIR:"*) PATH_HAS_INSTALL=1 ;;
+esac
+
+if [ "$SKIP_PATH_EDITS" -eq 0 ] && [ "$PATH_HAS_INSTALL" -eq 0 ]; then
     case "$SHELL_NAME" in
         zsh)
             if [ "$PLATFORM" = "darwin" ]; then
@@ -198,7 +206,7 @@ if [ "$SKIP_PATH_EDITS" -eq 0 ] && [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
         fi
     fi
 else
-    if [ "$SKIP_PATH_EDITS" -eq 1 ] && [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
+    if [ "$SKIP_PATH_EDITS" -eq 1 ] && [ "$PATH_HAS_INSTALL" -eq 0 ]; then
         progress "non-interactive shell detected; skipping PATH edits"
     fi
 fi
@@ -210,7 +218,11 @@ progress "try it: git-acm --help"
 progress "all done 🎉 !!!"
 
 # Do not source shell configs; print instructions instead
-if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
+PATH_HAS_INSTALL_FINAL=0
+case ":$PATH:" in
+    *":$INSTALL_DIR:"*) PATH_HAS_INSTALL_FINAL=1 ;;
+esac
+if [ "$PATH_HAS_INSTALL_FINAL" -eq 0 ]; then
   case "$SHELL_NAME" in
     zsh)
       if [ "$PLATFORM" = "darwin" ]; then hint_file="~/.zprofile"; else hint_file="~/.zshrc"; fi ;;
