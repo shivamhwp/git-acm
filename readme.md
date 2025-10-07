@@ -22,7 +22,7 @@ OPENROUTER_API_KEY="your_api_key_here"
 ```
 4. run `git-acm get-models` to fetch available models (run once, stores locally). you can run `git-acm list` to see the list of the models.
 5. go to [openrouter.ai/models](openrouter.ai/models), click copy model id. 
-![Model selection screenshot](https://ypazyw0thq.ufs.sh/f/38t7p527clgq7em4D2IYty0zsu2PpBGJxga1efWZASI7i4DU)
+![Model selection screenshot](/assets/images/copy-model-id.png)
 6. run `git-acm use <copied_model_id>` to select the model.
 7. stage your changes with `git add .` or specific files.
 8. just run `git-acm` to generate and use the commit message(it already gets copied to the clipboard automatically).
@@ -75,8 +75,11 @@ bhai(s) : [sargam](https://x.com/sargampoudel) (idea) and [smr](https://x.com/sm
 
 <br>
 
-> **config storage** <br/>
+> **config storage** ---------------- <br/>
 >`git-acm-prefs.json` (model + autocommit prefs.) and `models.json` (list of models available) are stored in your OS config directory.  
 > - **macOS:** `~/Library/Application Support/git-acm`  
 > - **Linux:** `$XDG_CONFIG_HOME/git-acm`  
 > - **Windows:** `%APPDATA%/git-acm`
+
+> **note** --------------------- <br>
+> This tool sends the staged git diff to OpenRouter to generate a commit message. Review staged changes and avoid including sensitive content.

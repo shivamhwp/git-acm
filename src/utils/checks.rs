@@ -23,7 +23,7 @@ impl Check {
         if value.is_empty() {
             println!(
                 "{}",
-                "are the stages changed ? try `git add <file_name>`".red()
+                "no staged changes found. stage files with `git add <file>` and retry".red()
             );
             std::process::exit(1)
         }

@@ -26,7 +26,7 @@ jobs:
             target: x86_64-unknown-linux-gnu
             ext: ""
           - name: linux-aarch64
-            runner: ubuntu-24.04-arm
+            runner: ubuntu-24.04-arm64
             target: aarch64-unknown-linux-gnu
             ext: ""
           - name: macos-x86_64

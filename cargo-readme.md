@@ -43,8 +43,12 @@ git-acm
 ```
 <br/>
 
-> **config storage** <br/>
+
+> **config storage** ---------------- <br/>
 >`git-acm-prefs.json` (model + autocommit prefs.) and `models.json` (list of models available) are stored in your OS config directory.  
 > - **macOS:** `~/Library/Application Support/git-acm`  
 > - **Linux:** `$XDG_CONFIG_HOME/git-acm`  
 > - **Windows:** `%APPDATA%/git-acm`
+
+> **note** --------------------- <br>
+> This tool sends the staged git diff to OpenRouter to generate a commit message. Review staged changes and avoid including sensitive content.

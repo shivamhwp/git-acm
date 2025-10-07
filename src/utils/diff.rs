@@ -47,7 +47,11 @@ pub fn get_diff() -> String {
             Check::is_diff_empty(&result);
             return result;
         }
-        Err(_) => return "".to_string(),
+        Err(_) => {
+            println!("{}", "failed to read staged diff".red());
+            println!("{}", "ensure Git is installed and run inside a Git repo".red());
+            std::process::exit(1)
+        }
     }
 }
 
