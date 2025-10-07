@@ -7,65 +7,142 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+
+env:
+  SBOM: "true"
 
 jobs:
-  release:
-    name: Release - ${{ matrix.platform.os }}
-    runs-on: ${{ matrix.platform.os }}
+  build:
+    name: Build ${{ matrix.platform.name }}
     strategy:
       fail-fast: false
       matrix:
         platform:
-          - os: ubuntu-latest
+          - name: linux-x86_64
+            runner: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
-            name: git-acm-linux-x86_64
-          - os: macos-latest
+          - name: linux-aarch64
+            runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+          - name: macos-x86_64
+            runner: macos-13
             target: x86_64-apple-darwin
-            name: git-acm-darwin-x86_64
-          - os: windows-latest
+          - name: macos-arm64
+            runner: macos-14
+            target: aarch64-apple-darwin
+          - name: windows-x86_64
+            runner: windows-latest
             target: x86_64-pc-windows-msvc
-            name: git-acm-windows-x86_64.exe
+    runs-on: ${{ matrix.platform.runner }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.platform.target }}
 
-      - name: Build
-        run: cargo build --release --target ${{ matrix.platform.target }}
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
 
-      - name: Prepare Release
+      - name: Build
+        run: cargo build --locked --release --target ${{ matrix.platform.target }}
+
+      - name: Strip binary (Linux/macOS)
+        if: ${{ runner.os != 'Windows' }}
         shell: bash
         run: |
-          # Copy binary with proper permissions
-          if [ "${{ matrix.platform.os }}" = "windows-latest" ]; then
-            cp "target/${{ matrix.platform.target }}/release/git-acm.exe" "${{ matrix.platform.name }}"
-          else
-            cp "target/${{ matrix.platform.target }}/release/git-acm" "${{ matrix.platform.name }}"
-            # Ensure binary is executable
-            chmod +x "${{ matrix.platform.name }}"
+          set -euo pipefail
+          BIN=target/${{ matrix.platform.target }}/release/git-acm
+          if [ -f "$BIN" ]; then
+            strip "$BIN" || true
           fi
 
-          # Generate checksum files
-          if [ "${{ matrix.platform.os }}" = "windows-latest" ]; then
-            certutil -hashfile "${{ matrix.platform.name }}" SHA256 | grep -v "^SHA256" | grep -v "^CertUtil" | tr -d " \t\r\n" > "${{ matrix.platform.name }}.sha256"
-          elif [ "${{ matrix.platform.os }}" = "macos-latest" ]; then
-            shasum -a 256 "${{ matrix.platform.name }}" | cut -d ' ' -f 1 > "${{ matrix.platform.name }}.sha256"
-          else
-            sha256sum "${{ matrix.platform.name }}" | cut -d ' ' -f 1 > "${{ matrix.platform.name }}.sha256"
-          fi
 
-          # Show generated checksum for verification in logs
-          echo "Generated checksum for ${{ matrix.platform.name }}:"
-          cat "${{ matrix.platform.name }}.sha256"
 
-      - name: Release
-        uses: ncipollo/release-action@v1
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
         with:
-          artifacts: ${{ matrix.platform.name }},${{ matrix.platform.name }}.sha256
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          artifactContentType: application/octet-stream # Ensure binary format is preserved
+          name: ${{ matrix.platform.target }}
+          path: |
+            target/${{ matrix.platform.target }}/release/git-acm*
+
+  package:
+    name: Package, checksum, sign, and release
+    needs: [build]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/raw
+
+      - name: Prepare archives
+        run: |
+          set -euo pipefail
+          sudo apt-get update && sudo apt-get install -y zip
+          mkdir -p dist/out
+          for dir in dist/raw/*; do
+            name=$(basename "$dir")
+            case "$name" in
+              x86_64-unknown-linux-gnu)
+                plat="linux-x86_64"; bin="$dir/git-acm"; kind="tar" ;;
+              aarch64-unknown-linux-gnu)
+                plat="linux-aarch64"; bin="$dir/git-acm"; kind="tar" ;;
+              x86_64-apple-darwin)
+                plat="darwin-x86_64"; bin="$dir/git-acm"; kind="tar" ;;
+              aarch64-apple-darwin)
+                plat="darwin-arm64"; bin="$dir/git-acm"; kind="tar" ;;
+              x86_64-pc-windows-msvc)
+                plat="windows-x86_64"; bin="$dir/git-acm.exe"; kind="zip" ;;
+              *) echo "Skipping unknown artifact: $name" >&2; continue ;;
+            esac
+            pkgdir="dist/package/git-acm-$plat"
+            mkdir -p "$pkgdir"
+            install -m 0755 "$bin" "$pkgdir/$(basename "$bin")"
+            cp -v LICENSE "$pkgdir/" || true
+            cp -v readme.md "$pkgdir/README.md" || true
+            if [ "$kind" = "tar" ]; then
+              tar -C dist/package -czf "dist/out/git-acm-$plat.tar.gz" "git-acm-$plat"
+            else
+              (cd dist/package && zip -r "../out/git-acm-$plat.zip" "git-acm-$plat")
+            fi
+          done
+
+      - name: Generate aggregated checksums
+        run: |
+          set -euo pipefail
+          cd dist/out
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum *.tar.gz *.zip > checksums.txt
+          else
+            shasum -a 256 *.tar.gz *.zip > checksums.txt
+          fi
+          cat checksums.txt
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3.6.0
+
+      - name: Sign archives and checksums (keyless)
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+        run: |
+          set -euo pipefail
+          cd dist/out
+          for f in *.tar.gz *.zip checksums.txt; do
+            echo "Signing $f"
+            cosign sign-blob --yes --output-signature "$f.sig" --output-certificate "$f.cert" "$f"
+          done
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/out/*
+          generate_release_notes: true

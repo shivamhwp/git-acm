@@ -3,13 +3,55 @@ use yansi::Paint;
 
 use crate::utils::checks::Check;
 
+fn default_excludes() -> Vec<&'static str> {
+    vec![
+        ":(exclude)node_modules/**",
+        ":(exclude)dist/**",
+        ":(exclude)build/**",
+        ":(exclude)target/**",
+        ":(exclude)vendor/**",
+        ":(exclude).next/**",
+        ":(exclude)out/**",
+        ":(exclude)*.min.js",
+        ":(exclude)*.min.mjs",
+        ":(exclude)*.min.css",
+        ":(exclude)*.map",
+        ":(exclude)package-lock.json",
+        ":(exclude)bun.lockb",
+        ":(exclude)bun.lock",
+        ":(exclude)pnpm-lock.yaml",
+        ":(exclude)yarn.lock",
+        ":(exclude)Cargo.lock",
+    ]
+}
+
+fn build_git_diff_args() -> Vec<String> {
+    let mut args: Vec<String> = vec![
+        "diff".into(),
+        "--staged".into(),
+        "--unified=0".into(),
+        "--no-color".into(),
+        "--".into(),
+        ".".into(),
+    ];
+    for p in default_excludes() {
+        args.push(p.to_string());
+    }
+    args
+}
+
 pub fn get_diff() -> String {
-    match cmd!("git", "diff", "--staged", "--color=always").read() {
+    let args = build_git_diff_args();
+    match cmd("git", args).read() {
         Ok(result) => {
             Check::is_diff_empty(&result);
             return result;
         }
-        Err(_) => return "".to_string(),
+        Err(_) => {
+            println!("{}", "failed to read staged diff".red());
+            println!("{}", "ensure Git is installed and run inside a Git repo".red());
+            std::process::exit(1)
+        }
     }
 }
 

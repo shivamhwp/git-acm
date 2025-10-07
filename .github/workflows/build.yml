@@ -1,0 +1,208 @@
+name: build-matrix
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  SBOM: "true"             # generate SBOM
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: linux-x86_64
+            runner: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            ext: ""
+          - name: linux-aarch64
+            runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            ext: ""
+          - name: macos-x86_64
+            runner: macos-13
+            target: x86_64-apple-darwin
+            ext: ""
+          - name: macos-arm64
+            runner: macos-14
+            target: aarch64-apple-darwin
+            ext: ""
+          - name: windows-x86_64
+            runner: windows-latest
+            target: x86_64-pc-windows-msvc
+            ext: ".exe"
+    runs-on: ${{ matrix.platform.runner }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform.target }}
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Show versions
+        run: |
+          rustc -Vv
+          cargo -V
+
+      - name: Build (release)
+        run: |
+          cargo build --locked --release --target ${{ matrix.platform.target }}
+
+      - name: Strip binary
+        if: ${{ runner.os != 'Windows' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BIN=target/${{ matrix.platform.target }}/release/git-acm${{ matrix.platform.ext }}
+          if [ -f "$BIN" ]; then
+            strip "$BIN" || true
+          fi
+
+      # Removed UPX compression step per configuration
+
+
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform.target }}
+          path: |
+            target/${{ matrix.platform.target }}/release/git-acm${{ matrix.platform.ext }}
+
+  package:
+    name: Package archives and checksums
+    needs: [build]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download built artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/raw
+
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip
+
+      - name: Prepare archive structure
+        run: |
+          set -euo pipefail
+          mkdir -p dist/out
+          # Map artifact names to friendly platform names
+          for dir in dist/raw/*; do
+            name=$(basename "$dir")
+            # Windows packaging (.zip)
+            if [ -f "$dir/git-acm.exe" ]; then
+              bin="$dir/git-acm.exe"
+              plat="windows-x86_64"
+              pkgdir="dist/package/git-acm-$plat"
+              mkdir -p "$pkgdir"
+              install -m 0755 "$bin" "$pkgdir/git-acm.exe"
+              cp -v LICENSE "$pkgdir/" || true
+              cp -v readme.md "$pkgdir/README.md" || true
+              (cd dist/package && zip -r "../out/git-acm-$plat.zip" "git-acm-$plat")
+              continue
+            fi
+
+            # Unix packaging (.tar.gz)
+            bin="$dir/git-acm"
+            case "$name" in
+              x86_64-unknown-linux-gnu)
+                plat="linux-x86_64" ;;
+              aarch64-unknown-linux-gnu)
+                plat="linux-aarch64" ;;
+              x86_64-apple-darwin)
+                plat="darwin-x86_64" ;;
+              aarch64-apple-darwin)
+                plat="darwin-arm64" ;;
+              *)
+                echo "Skipping unknown artifact: $name" >&2
+                continue ;;
+            esac
+            pkgdir="dist/package/git-acm-$plat"
+            mkdir -p "$pkgdir"
+            install -m 0755 "$bin" "$pkgdir/git-acm"
+            cp -v LICENSE "$pkgdir/" || true
+            cp -v readme.md "$pkgdir/README.md" || true
+            tar -C dist/package -czf "dist/out/git-acm-$plat.tar.gz" "git-acm-$plat"
+          done
+
+      - name: Generate aggregated checksums
+        run: |
+          set -euo pipefail
+          cd dist/out
+          # Prefer sha256sum; fallback to shasum -a 256
+          files="*.tar.gz"
+          if ls *.zip >/dev/null 2>&1; then files="$files *.zip"; fi
+          if command -v sha256sum >/dev/null 2>&1; then
+            eval "sha256sum $files > checksums.txt"
+          else
+            eval "shasum -a 256 $files > checksums.txt"
+          fi
+          cat checksums.txt
+
+      - name: Upload packaged artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: git-acm-archives
+          path: |
+            dist/out/*.tar.gz
+            dist/out/*.zip
+            dist/out/checksums.txt
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3.6.0
+
+      - name: Sign archives and checksums (keyless)
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+        run: |
+          set -euo pipefail
+          cd dist/out
+          shopt -s nullglob
+          for f in *.tar.gz *.zip checksums.txt; do
+            echo "Signing $f"
+            cosign sign-blob --yes --output-signature "$f.sig" --output-certificate "$f.cert" "$f"
+          done
+
+      - name: Upload signatures
+        uses: actions/upload-artifact@v4
+        with:
+          name: git-acm-archives-signatures
+          path: |
+            dist/out/*.sig
+            dist/out/*.cert
+
+      - name: Generate SBOM (optional)
+        if: ${{ env.SBOM == 'true' }}
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Upload SBOM (optional)
+        if: ${{ env.SBOM == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: git-acm-sbom
+          path: sbom.spdx.json
+
+
